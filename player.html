@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radio App</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0f2027;
+  color:white;
+  display:flex;
+}
+
+.sidebar {
+  width:280px;
+  background:#111;
+  overflow-y:auto;
+  height:100vh;
+  padding:10px;
+}
+
+.search {
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:10px;
+}
+
+.station {
+  display:flex;
+  align-items:center;
+  padding:10px;
+  cursor:pointer;
+  border-bottom:1px solid #222;
+}
+
+.station img {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  margin-right:10px;
+}
+
+.station:hover {
+  background:#222;
+}
+
+.player {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.player img {
+  width:120px;
+  border-radius:20px;
+  margin-bottom:10px;
+}
+
+button {
+  padding:15px 25px;
+  margin:10px;
+  border:none;
+  border-radius:50px;
+  background:#00c6ff;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <input type="text" id="search" class="search" placeholder="🔍 Kërko radio...">
+  <div id="stations"></div>
+</div>
+
+<div class="player">
+  <img id="logo" src="">
+  <h2 id="radioName">Zgjidh një radio</h2>
+  <audio id="audio" controls autoplay></audio>
+
+  <div>
+    <button onclick="audio.play()">▶️</button>
+    <button onclick="audio.pause()">⏸️</button>
+  </div>
+</div>
+
+<script>
+let allStations = [];
+const audio = document.getElementById("audio");
+
+fetch("radios.json")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("stations");
+
+    for (let country in data) {
+      let title = document.createElement("h3");
+      title.innerText = country;
+      container.appendChild(title);
+
+      data[country].forEach(st => {
+        allStations.push(st);
+
+        let div = document.createElement("div");
+        div.className = "station";
+
+        div.innerHTML = `
+          <img src="${st.logo}">
+          <span>${st.name}</span>
+        `;
+
+        div.onclick = () => playStation(st);
+
+        container.appendChild(div);
+      });
+    }
+
+    autoPlayFromURL();
+  });
+
+function playStation(st) {
+  audio.src = st.stream;
+  document.getElementById("radioName").innerText = st.name;
+  document.getElementById("logo").src = st.logo;
+  audio.play();
+}
+
+function autoPlayFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name");
+
+  if (!name) return;
+
+  const found = allStations.find(s => s.name === name);
+  if (found) playStation(found);
+}
+
+// SEARCH
+document.getElementById("search").addEventListener("input", function() {
+  const val = this.value.toLowerCase();
+  const items = document.querySelectorAll(".station");
+
+  items.forEach(item => {
+    item.style.display = item.innerText.toLowerCase().includes(val)
+      ? "flex"
+      : "none";
+  });
+});
+</script>
+
+</body>
+</html>
