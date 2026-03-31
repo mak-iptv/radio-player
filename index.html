@@ -3,130 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <title>Radio Player</title>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
 <style>
-body {
-  background: #111;
-  color: white;
-  font-family: Arial;
-  text-align: center;
-}
-
-select, button {
-  padding: 10px;
-  margin: 10px;
-  font-size: 16px;
-}
-
-audio {
-  margin-top: 20px;
-  width: 80%;
-}
+body { font-family: Arial, sans-serif; margin: 20px; }
+h2 { margin-top: 30px; }
+.radio-list { margin-bottom: 20px; }
+button { margin: 5px 0; padding: 8px 12px; cursor: pointer; }
 </style>
 </head>
-
 <body>
+<h1>Radio Player</h1>
 
-<h2>🎧 Radio Player</h2>
+<select id="countrySelect">
+    <option value="">Zgjidh vendin</option>
+</select>
 
-<select id="category"></select>
-<select id="radio"></select>
-
-<br>
-
-<button onclick="playRadio()">▶ Play</button>
-<button onclick="stopRadio()">⏹ Stop</button>
-
-<br>
-
-<audio id="audio" controls></audio>
+<div id="radioContainer"></div>
 
 <script>
-let data;
-let audio = document.getElementById("audio");
-let hls;
-
-// Load JSON
-fetch("radio.json")
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    loadCategories();
-  });
-
-function loadCategories() {
-  let cat = document.getElementById("category");
-  cat.innerHTML = "";
-
-  Object.keys(data).forEach(c => {
-    let opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    cat.appendChild(opt);
-  });
-
-  loadRadios();
+// Load radios.json
+async function loadRadios() {
+    const res = await fetch('radios.json');
+    const data = await res.json();
+    return data;
 }
 
-function loadRadios() {
-  let cat = document.getElementById("category").value;
-  let radios = document.getElementById("radio");
-
-  radios.innerHTML = "";
-
-  data[cat].forEach(r => {
-    let opt = document.createElement("option");
-    opt.value = r[1];
-    opt.textContent = r[0];
-    radios.appendChild(opt);
-  });
+function createButton(name, url) {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.onclick = () => {
+        window.open(url); // hap në VLC/MX Player
+    };
+    return btn;
 }
 
-document.getElementById("category").addEventListener("change", loadRadios);
-
-function playRadio() {
-  let url = document.getElementById("radio").value;
-
-  if (hls) {
-    hls.destroy();
-    hls = null;
-  }
-
-  // HLS (.m3u8)
-  if (url.includes(".m3u8")) {
-    if (Hls.isSupported()) {
-      hls = new Hls();
-      hls.loadSource(url);
-      hls.attachMedia(audio);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        audio.play();
-      });
-    } else if (audio.canPlayType("application/vnd.apple.mpegurl")) {
-      audio.src = url;
-      audio.play();
+function populateCountries(radios) {
+    const select = document.getElementById('countrySelect');
+    for (const country in radios) {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        select.appendChild(option);
     }
-  } 
-  else {
-    // MP3 / AAC
-    audio.src = url;
-    audio.play().catch(e => {
-      alert("❌ Nuk mund të luhet ky stream në browser");
-      console.log(e);
+}
+
+function showRadios(radios, country) {
+    const container = document.getElementById('radioContainer');
+    container.innerHTML = '';
+    if (!country || !radios[country]) return;
+    const list = document.createElement('div');
+    list.className = 'radio-list';
+    radios[country].forEach(([name, url]) => {
+        const btn = createButton(name, url);
+        list.appendChild(btn);
+        list.appendChild(document.createElement('br'));
     });
-  }
+    container.appendChild(list);
 }
 
-function stopRadio() {
-  audio.pause();
-  audio.src = "";
-  if (hls) {
-    hls.destroy();
-    hls = null;
-  }
+async function init() {
+    const radios = await loadRadios();
+    populateCountries(radios);
+    const select = document.getElementById('countrySelect');
+    select.addEventListener('change', () => {
+        showRadios(radios, select.value);
+    });
 }
+
+init();
 </script>
-
 </body>
 </html>
