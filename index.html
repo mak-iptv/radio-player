@@ -379,7 +379,7 @@
     let currentStationStaticInfo = null;
     let metadataInterval = null;
 
-    // ========== STACIONET E PARACAKTUARA (PLOTËSISHT SIPAS JSON QË DHAVE) ==========
+    // ========== STACIONET E PARACAKTUARA (TANI PËRFSHIJNË EDHE BULLGARINË) ==========
     const DEFAULT_STATIONS = {
         "Shqipëri / Kosovë": [
             ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream", null],
@@ -571,6 +571,31 @@
             ["Play Urban Montenegro", "https://stream.playradio.me:8443/urban.aac", null],
             ["Radio Herceg Novi", "http://s2.voscast.com:10354/", null],
             ["Radio S1", "https://edge-rs-04.maksnet.tv/asmedia/radios1-cg/playlist.m3u8", null]
+        ],
+        "Bullgaria": [
+            ["Radio Fresh", "https://stream.rcast.net/71094", null],
+            ["Energy 89.5", "https://play.global.audio/energy-00shi.aac", null],
+            ["NRJ Bulgaria", "https://play.global.audio/nrj.aac", null],
+            ["Radio 1 (Bulgaria)", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_1AAC_L.aac", null],
+            ["Radio 1 Rock", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_1_ROCKAAC_L.aac", null],
+            ["Radio Veronika", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_VERONIKAAAC_L.aac", null],
+            ["Radio Nova (Bulgaria)", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_NOVAAAC_L.aac", null],
+            ["Darik Radio", "https://a12.asurahosting.com/listen/darik_radio/radio.mp3", null],
+            ["Magic FM (Bulgaria)", "https://nova-radio.neterra.tv/magicfm", null],
+            ["Vitosha Radio", "https://nova-radio.neterra.tv/vitosha", null],
+            ["The Voice (Bulgaria)", "https://nova-radio.neterra.tv/thevoice", null],
+            ["City Radio (Bulgaria)", "https://play.global.audio/city.opus", null],
+            ["Radio Melody (Bulgaria)", "http://193.108.24.6:8000/melody?", null],
+            ["Radio Veselina", "https://nova-radio.neterra.tv/veselina", null],
+            ["BTV Radio", "https://web.static.btv.bg/radioplayer/btvradio.mp3", null],
+            ["Njoy Radio", "https://web.static.btv.bg/radio/njoy-radio-proxy/index.php", null],
+            ["Radio Ultra", "http://88.80.96.25:40070/ultra.mp3", null],
+            ["Radio Folk BG", "http://listen.folkbg.net:8001/folkbg", null],
+            ["Radio Zara (Bulgaria)", "https://radio.jump.bg/proxy/feed911?mp=/MLR90S", null],
+            ["Radio FM+", "https://radio.jump.bg/proxy/predp?mp=/MDR", null],
+            ["Alpha Radio", "http://a1.virtualradio.eu:8000/powerfm.mp3", null],
+            ["Radio 1 (80s)", "https://radio.jump.bg/proxy/feed911?mp=/MLR80S", null],
+            ["Radio Sofia", "https://lb-hls.cdn.bg/2032/fls/Sofia.stream/playlist.m3u8", null]
         ]
     };
 
@@ -585,10 +610,10 @@
             radiosData = data;
             console.log("Radiot u ngarkuan nga radios.json");
         } catch (err) {
-            console.warn("radios.json nuk u gjet ose është bosh. Përdoren stacionet e paracaktuara.", err);
+            console.warn("radios.json nuk u gjet ose është bosh. Përdoren stacionet e paracaktuara (përfshirë Bullgarinë).", err);
             radiosData = DEFAULT_STATIONS;
             errorDiv.style.display = 'block';
-            errorDiv.innerHTML = `⚠️ Skedari radios.json nuk u gjet. Duke përdorur stacionet e plota të integruara. Nëse dëshiron të përditësosh listën, krijo një skedar radios.json me të njëjtin format.`;
+            errorDiv.innerHTML = `⚠️ Skedari radios.json nuk u gjet. Duke përdorur stacionet e plota të integruara (përfshirë Bullgarinë). Nëse dëshiron të përditësosh listën, krijo një skedar radios.json me të njëjtin format.`;
             setTimeout(() => { errorDiv.style.display = 'none'; }, 8000);
         } finally {
             populateCountries();
