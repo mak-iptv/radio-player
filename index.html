@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio App</title>
+<title>Radio Player</title>
 
 <style>
 body {
   margin:0;
-  font-family:Arial;
-  background:#0f2027;
+  font-family:Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
   display:flex;
+  height:100vh;
 }
 
 .sidebar {
   width:280px;
   background:#111;
   overflow-y:auto;
-  height:100vh;
   padding:10px;
 }
 
@@ -64,12 +64,13 @@ body {
 }
 
 button {
-  padding:15px 25px;
-  margin:10px;
+  padding:12px 25px;
+  margin:5px;
   border:none;
   border-radius:50px;
   background:#00c6ff;
   cursor:pointer;
+  font-size:16px;
 }
 </style>
 </head>
@@ -84,8 +85,7 @@ button {
 <div class="player">
   <img id="logo" src="">
   <h2 id="radioName">Zgjidh një radio</h2>
-  <audio id="audio" controls autoplay></audio>
-
+  <audio id="audio" controls autoplay crossorigin="anonymous"></audio>
   <div>
     <button onclick="audio.play()">▶️</button>
     <button onclick="audio.pause()">⏸️</button>
@@ -93,8 +93,8 @@ button {
 </div>
 
 <script>
-let allStations = [];
 const audio = document.getElementById("audio");
+let allStations = [];
 
 fetch("radios.json")
   .then(res => res.json())
@@ -111,14 +111,12 @@ fetch("radios.json")
 
         let div = document.createElement("div");
         div.className = "station";
-
         div.innerHTML = `
-          <img src="${st.logo}">
+          <img src="${st.logo}" alt="${st.name}">
           <span>${st.name}</span>
         `;
 
         div.onclick = () => playStation(st);
-
         container.appendChild(div);
       });
     }
@@ -128,30 +126,32 @@ fetch("radios.json")
 
 function playStation(st) {
   audio.src = st.stream;
+  audio.load();
+  audio.play().catch(() => console.log("Kliko ▶️ për ta nisur"));
   document.getElementById("radioName").innerText = st.name;
   document.getElementById("logo").src = st.logo;
-  audio.play();
 }
 
+// Autoplay nga URL (nga bot ose link direkt)
 function autoPlayFromURL() {
   const params = new URLSearchParams(window.location.search);
-  const name = params.get("name");
+  const streamParam = decodeURIComponent(params.get("stream") || "");
+  const nameParam = decodeURIComponent(params.get("name") || "");
 
-  if (!name) return;
-
-  const found = allStations.find(s => s.name === name);
-  if (found) playStation(found);
+  if (streamParam) {
+    audio.src = streamParam;
+    audio.load();
+    audio.play().catch(() => console.log("Kliko ▶️ për ta nisur"));
+    document.getElementById("radioName").innerText = nameParam || "Radio Live";
+  }
 }
 
 // SEARCH
 document.getElementById("search").addEventListener("input", function() {
   const val = this.value.toLowerCase();
   const items = document.querySelectorAll(".station");
-
   items.forEach(item => {
-    item.style.display = item.innerText.toLowerCase().includes(val)
-      ? "flex"
-      : "none";
+    item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
   });
 });
 </script>
