@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Wave Radio | Player HD Shqip</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -78,7 +76,6 @@
             margin-top: 0.4rem;
         }
 
-        /* Butoni APK */
         .apk-button {
             position: absolute;
             top: 1.5rem;
@@ -104,7 +101,6 @@
             transform: scale(1.02);
         }
 
-        /* Now Playing Card */
         .now-playing-card {
             background: rgba(0, 0, 0, 0.4);
             margin: 1.5rem 2rem 0;
@@ -115,7 +111,6 @@
             gap: 1.2rem;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
         }
 
         .artist-image {
@@ -317,7 +312,6 @@
                 <i class="fas fa-waveform"></i> WAVE RADIO
             </div>
             <div class="tagline">HD Radio · Artist & kënga në kohë reale</div>
-            <!-- BUTONI SHKARKO APK -->
             <a href="https://apk.e-droid.net/apk/app3979905-lx7jkw.apk?v=1" class="apk-button" target="_blank" rel="noopener noreferrer">
                 <i class="fab fa-android"></i> Shkarko APK
             </a>
@@ -367,7 +361,7 @@
 </div>
 
 <script>
-    // ========== DOM ELEMENTS ==========
+    // DOM elements
     const audioPlayer = document.getElementById('audioPlayer');
     const nowPlayingTrack = document.getElementById('nowPlayingTrack');
     const nowPlayingArtist = document.getElementById('nowPlayingArtist');
@@ -379,13 +373,14 @@
     const artistImage = document.getElementById('artistImage');
     const artistFallback = document.getElementById('artistFallback');
 
+    let radiosData = {};
     let currentStationUrl = '';
     let currentStationName = '';
     let currentStationStaticInfo = null;
     let metadataInterval = null;
 
-    // ========== STACIONET RADIO (Embedded) ==========
-    const STATIONS = {
+    // Stacionet e paracaktuara (nëse radios.json mungon)
+    const DEFAULT_STATIONS = {
         "Shqipëri": [
             ["Top Albania Radio", "https://radio.albanianstream.com/topalbania", "🎵 Pa metadata, por ju dëgjojmë!"],
             ["Radio Tirana", "https://icecast.rts.al/radiotirana", null],
@@ -405,10 +400,64 @@
         ]
     };
 
-    // ========== DEEZER JSONP (Artist Image) ==========
+    // ========== NGARKO RADIOT NGA radios.json ==========
+    async function loadRadios() {
+        try {
+            radioContainer.innerHTML = `<div class="station-btn" style="justify-content:center;"><i class="fas fa-spinner fa-pulse"></i> Po ngarkohen stacionet...</div>`;
+            const res = await fetch('radios.json');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            radiosData = await res.json();
+            if (Object.keys(radiosData).length === 0) throw new Error('empty');
+            console.log("Radiot u ngarkuan nga radios.json");
+        } catch (err) {
+            console.warn("radios.json nuk u gjet ose është bosh. Përdoren stacionet e paracaktuara.", err);
+            radiosData = DEFAULT_STATIONS;
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `⚠️ Skedari radios.json nuk u gjet. Duke përdorur stacione shembull. Krijo një skedar radios.json për të shtuar më shumë. Për të vendosur manualisht këngën, shto një element të tretë: ["Emri", "URL", "Teksti i këngës"]`;
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 8000);
+        } finally {
+            populateCountries();
+            radioContainer.innerHTML = '';
+            if (Object.keys(radiosData).length === 0) {
+                radioContainer.innerHTML = '<div class="station-btn">❌ Asnjë stacion</div>';
+            }
+        }
+    }
+
+    function populateCountries() {
+        countrySelect.innerHTML = '<option value="">🌍 Zgjidh vendin</option>';
+        Object.keys(radiosData).sort().forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countrySelect.appendChild(option);
+        });
+    }
+
+    function showRadios(country) {
+        radioContainer.innerHTML = '';
+        if (!country || !radiosData[country]) {
+            radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center;">📭 Zgjidh një vend më lart</div>';
+            stationCountSpan.textContent = '';
+            return;
+        }
+        const stations = radiosData[country];
+        stationCountSpan.textContent = `${stations.length} stacione`;
+        stations.forEach((item) => {
+            const name = item[0];
+            const url = item[1];
+            const staticInfo = item[2] || null;
+            const btn = document.createElement('button');
+            btn.className = 'station-btn';
+            btn.innerHTML = `<i class="fas fa-play-circle"></i> ${name}`;
+            btn.onclick = () => playRadio(name, url, staticInfo, btn);
+            radioContainer.appendChild(btn);
+        });
+    }
+
+    // ========== FUNKSIONET PËR METADATA DHE FOTO ==========
     function loadArtistImage(artistName) {
         if (!artistName) return;
-
         let cleanArtist = artistName.replace(/\(.*?\)|\[.*?\]|[^a-zA-Z0-9 ]/g, "").trim();
         if (!cleanArtist) return;
 
@@ -434,7 +483,6 @@
         if (script) script.remove();
     };
 
-    // ========== METADATA FETCH (Radio Browser API) ==========
     async function fetchMetadataFromAPI(stationUrl) {
         const servers = ['de1', 'nl1', 'fr1'];
         for (const server of servers) {
@@ -465,7 +513,6 @@
         }
 
         try {
-            // Manual static info (third element in station array)
             if (currentStationStaticInfo && currentStationStaticInfo !== '') {
                 nowPlayingTrack.textContent = currentStationStaticInfo;
                 nowPlayingArtist.textContent = stationName;
@@ -478,9 +525,7 @@
             const stationData = await fetchMetadataFromAPI(stationUrl);
             if (stationData && stationData.song) {
                 let song = stationData.song;
-                let artist = null;
-                let title = null;
-
+                let artist = null, title = null;
                 if (song.includes(' - ')) {
                     [artist, title] = song.split(' - ');
                 } else if (song.includes(' – ')) {
@@ -499,7 +544,6 @@
                     artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
                 }
             } else {
-                // No metadata available
                 nowPlayingTrack.textContent = stationName;
                 nowPlayingArtist.textContent = "❓ Pa metadata nga stacioni";
                 artistImage.style.display = "none";
@@ -540,38 +584,6 @@
         }
     }
 
-    // ========== RADIO LIST UI ==========
-    function populateCountries() {
-        countrySelect.innerHTML = '<option value="">🌍 Zgjidh vendin</option>';
-        Object.keys(STATIONS).sort().forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countrySelect.appendChild(option);
-        });
-    }
-
-    function showRadios(country) {
-        radioContainer.innerHTML = '';
-        if (!country || !STATIONS[country]) {
-            radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center;">📭 Zgjidh një vend më lart</div>';
-            stationCountSpan.textContent = '';
-            return;
-        }
-        const stations = STATIONS[country];
-        stationCountSpan.textContent = `${stations.length} stacione`;
-        stations.forEach((item) => {
-            const name = item[0];
-            const url = item[1];
-            const staticInfo = item[2] || null;
-            const btn = document.createElement('button');
-            btn.className = 'station-btn';
-            btn.innerHTML = `<i class="fas fa-play-circle"></i> ${name}`;
-            btn.onclick = () => playRadio(name, url, staticInfo, btn);
-            radioContainer.appendChild(btn);
-        });
-    }
-
     function playRadio(name, url, staticInfo, btn) {
         stopMetadataInterval();
         if (currentStationUrl !== url) {
@@ -598,7 +610,7 @@
         btn.classList.add('active');
     }
 
-    // Country change
+    // Ndryshimi i vendit
     countrySelect.addEventListener('change', (e) => {
         showRadios(e.target.value);
         audioPlayer.pause();
@@ -617,10 +629,8 @@
     refreshBtn.addEventListener('click', manualRefresh);
     window.addEventListener('beforeunload', () => stopMetadataInterval());
 
-    // Initialize
-    populateCountries();
-    showRadios("Shqipëri");
-    countrySelect.value = "Shqipëri";
+    // Fillo
+    loadRadios();
 </script>
 </body>
 </html>
