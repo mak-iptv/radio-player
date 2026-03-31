@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Wave Radio | Player HD</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -51,7 +49,6 @@
             border: 1px solid rgba(59, 130, 246, 0.2);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
             overflow: hidden;
-            transition: var(--transition);
         }
 
         .app-header {
@@ -67,23 +64,15 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            letter-spacing: -0.02em;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .logo i {
-            background: none;
-            color: var(--primary);
-            font-size: 1.8rem;
         }
 
         .tagline {
             font-size: 0.8rem;
             color: var(--text-muted);
             margin-top: 0.4rem;
-            letter-spacing: 1px;
         }
 
         /* Now Playing Card */
@@ -97,7 +86,6 @@
             gap: 1.2rem;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
         }
 
         .artwork {
@@ -111,7 +99,6 @@
             font-size: 2rem;
             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
             border: 1px solid var(--border-glow);
-            transition: var(--transition);
         }
 
         .track-info {
@@ -131,7 +118,6 @@
             font-size: 1.3rem;
             line-height: 1.3;
             color: white;
-            margin-bottom: 0.2rem;
         }
 
         .track-artist {
@@ -153,19 +139,6 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .pulse {
-            width: 8px;
-            height: 8px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.7; }
-            100% { transform: scale(1.2); opacity: 0; }
         }
 
         .refresh-btn {
@@ -198,10 +171,6 @@
             outline: none;
         }
 
-        audio::-webkit-media-controls-panel {
-            background-color: #0f172a;
-        }
-
         .select-region {
             padding: 0.5rem 2rem;
         }
@@ -216,17 +185,10 @@
             font-family: 'Inter', sans-serif;
             font-weight: 500;
             cursor: pointer;
-            transition: var(--transition);
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
             background-repeat: no-repeat;
             background-position: right 1.2rem center;
-        }
-
-        .custom-select:hover, .custom-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-            outline: none;
         }
 
         .stations-area {
@@ -236,7 +198,6 @@
         .stations-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
             margin-bottom: 1rem;
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -264,25 +225,13 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            backdrop-filter: blur(4px);
         }
 
-        .station-btn i {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .station-btn:hover {
+        .station-btn:hover, .station-btn.active {
             background: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -8px var(--primary-glow);
             border-color: transparent;
-        }
-
-        .station-btn.active {
-            background: var(--primary);
-            border-color: transparent;
-            box-shadow: 0 0 12px var(--primary-glow);
         }
 
         .loader-small {
@@ -327,9 +276,7 @@
 <div class="radio-app">
     <div class="glass-card">
         <div class="app-header">
-            <div class="logo">
-                <i class="fas fa-waveform"></i> WAVE RADIO
-            </div>
+            <div class="logo"><i class="fas fa-waveform"></i> WAVE RADIO</div>
             <div class="tagline">HD Radio · Artist & kënga në kohë reale</div>
         </div>
 
@@ -340,14 +287,11 @@
                 <div class="track-name" id="nowPlayingTrack">Zgjidh një radio</div>
                 <div class="track-artist" id="nowPlayingArtist">—</div>
             </div>
-            <button class="refresh-btn" id="refreshMetadataBtn" title="Rifresko këngën aktuale"><i class="fas fa-sync-alt"></i></button>
+            <button class="refresh-btn" id="refreshMetadataBtn" title="Rifresko këngën"><i class="fas fa-sync-alt"></i></button>
         </div>
 
         <div class="audio-wrapper">
-            <audio id="audioPlayer" controls preload="none">
-                <source src="" type="audio/mpeg">
-                Shfletuesi juaj nuk e mbështet elementin audio.
-            </audio>
+            <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
         <div class="select-region">
@@ -362,7 +306,7 @@
                 <span id="stationCount"></span>
             </div>
             <div id="radioContainer" class="stations-grid">
-                <div class="station-btn" style="justify-content:center; background:transparent;"><i class="fas fa-spinner fa-pulse"></i> Duke ngarkuar...</div>
+                <div class="station-btn" style="justify-content:center;"><i class="fas fa-spinner fa-pulse"></i> Duke ngarkuar...</div>
             </div>
         </div>
 
@@ -388,9 +332,7 @@
     let radiosData = {};
     let currentStationUrl = '';
     let currentStationName = '';
-    let currentCountry = '';
     let metadataInterval = null;
-    let isLoadingMetadata = false;
 
     // Fallback stations if radios.json missing
     const DEFAULT_STATIONS = {
@@ -405,69 +347,79 @@
         ]
     };
 
-    // ========== METADATA FETCH ==========
+    // ========== METADATA FETCH (multiple servers) ==========
+    async function fetchMetadataFromAPI(stationUrl) {
+        const servers = ['de1', 'nl1', 'fr1']; // different Radio Browser mirrors
+        for (const server of servers) {
+            try {
+                const encodedUrl = encodeURIComponent(stationUrl);
+                const response = await fetch(`https://${server}.api.radio-browser.info/json/stations/byurl/${encodedUrl}`);
+                if (!response.ok) continue;
+                const stations = await response.json();
+                if (stations && stations.length > 0) {
+                    return stations[0];
+                }
+            } catch (e) {
+                console.warn(`${server} API failed`, e);
+            }
+        }
+        return null;
+    }
+
     async function fetchCurrentTrack(stationUrl, stationName, showLoading = true) {
-        if (!stationUrl || isLoadingMetadata) return;
+        if (!stationUrl) return;
+
         if (showLoading) {
             nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë të dhëna...`;
+            artworkIcon.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
         }
-        isLoadingMetadata = true;
+
         try {
-            const encodedUrl = encodeURIComponent(stationUrl);
-            const response = await fetch(`https://de1.api.radio-browser.info/json/stations/byurl/${encodedUrl}`);
-            if (!response.ok) throw new Error('API e pamundur');
-            const stations = await response.json();
-            if (stations && stations.length > 0) {
-                const station = stations[0];
-                let rawSong = station.song || station.name;
-                if (rawSong && rawSong !== station.name && rawSong.includes(' - ')) {
-                    const [artist, title] = rawSong.split(' - ');
+            const stationData = await fetchMetadataFromAPI(stationUrl);
+            if (stationData && stationData.song) {
+                let song = stationData.song;
+                // Try to split artist - title
+                if (song.includes(' - ')) {
+                    const [artist, title] = song.split(' - ');
                     nowPlayingArtist.textContent = artist.trim();
                     nowPlayingTrack.textContent = title.trim() || stationName;
-                } else if (rawSong && rawSong !== station.name) {
-                    nowPlayingTrack.textContent = rawSong;
-                    nowPlayingArtist.textContent = stationName;
+                } else if (song.includes(' – ')) {
+                    const [artist, title] = song.split(' – ');
+                    nowPlayingArtist.textContent = artist.trim();
+                    nowPlayingTrack.textContent = title.trim() || stationName;
                 } else {
-                    nowPlayingTrack.textContent = stationName;
-                    nowPlayingArtist.textContent = "🎵 Pa metadata tani";
+                    // If no separator, show whole string as title
+                    nowPlayingTrack.textContent = song;
+                    nowPlayingArtist.textContent = stationName;
                 }
-                // Change icon to music note when metadata present
                 artworkIcon.innerHTML = '<i class="fas fa-music"></i>';
             } else {
+                // No metadata from API
                 nowPlayingTrack.textContent = stationName;
-                nowPlayingArtist.textContent = "📡 Live stream";
-                artworkIcon.innerHTML = '<i class="fas fa-satellite-dish"></i>';
+                nowPlayingArtist.textContent = "🎵 Informacion në dispozicion?";
+                artworkIcon.innerHTML = '<i class="fas fa-microphone-alt"></i>';
             }
         } catch (err) {
-            console.warn("Metadata error:", err);
+            console.error("Metadata fetch error:", err);
             nowPlayingTrack.textContent = stationName;
-            nowPlayingArtist.textContent = "Kënga në radio (live)";
-            artworkIcon.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-        } finally {
-            isLoadingMetadata = false;
+            nowPlayingArtist.textContent = "⚠️ Nuk mund të merrej kënga";
+            artworkIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
         }
     }
 
-    // Manual refresh
     function manualRefresh() {
         if (currentStationUrl) {
             fetchCurrentTrack(currentStationUrl, currentStationName, true);
-            // Visual feedback
             refreshBtn.style.transform = 'rotate(360deg)';
             setTimeout(() => { refreshBtn.style.transform = ''; }, 500);
-        } else {
-            nowPlayingArtist.textContent = "Zgjidh një radio për të parë këngën";
         }
     }
 
-    // Start periodic metadata update (every 30s)
     function startMetadataInterval() {
         if (metadataInterval) clearInterval(metadataInterval);
-        if (currentStationUrl) {
+        if (currentStationUrl && !audioPlayer.paused) {
             metadataInterval = setInterval(() => {
-                if (currentStationUrl && !audioPlayer.paused) {
-                    fetchCurrentTrack(currentStationUrl, currentStationName, false);
-                }
+                fetchCurrentTrack(currentStationUrl, currentStationName, false);
             }, 30000);
         }
     }
@@ -488,18 +440,16 @@
             radiosData = await res.json();
             if (Object.keys(radiosData).length === 0) throw new Error('empty');
         } catch (err) {
-            console.warn("radios.json not found or invalid, using defaults", err);
+            console.warn("radios.json not found, using defaults", err);
             radiosData = DEFAULT_STATIONS;
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `⚠️ Skedari radios.json nuk u gjet. Duke përdorur stacione shembull. Krijo një skedar radios.json për të shtuar më shumë.`;
-            setTimeout(() => {
-                if (errorDiv.style.display === 'block') errorDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
         } finally {
             populateCountries();
             radioContainer.innerHTML = '';
             if (Object.keys(radiosData).length === 0) {
-                radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center;">❌ Asnjë stacion i disponueshëm</div>';
+                radioContainer.innerHTML = '<div class="station-btn">❌ Asnjë stacion</div>';
             }
         }
     }
@@ -517,7 +467,7 @@
     function showRadios(country) {
         radioContainer.innerHTML = '';
         if (!country || !radiosData[country]) {
-            radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center; background:transparent;">📭 Zgjidh një vend më lart</div>';
+            radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center;">📭 Zgjidh një vend më lart</div>';
             stationCountSpan.textContent = '';
             return;
         }
@@ -534,39 +484,30 @@
 
     function playRadio(name, url, btn) {
         stopMetadataInterval();
-        const isDifferentStation = (currentStationUrl !== url);
-        if (isDifferentStation) {
+        if (currentStationUrl !== url) {
             audioPlayer.src = url;
-            audioPlayer.play().catch(e => {
-                console.warn("Autoplay blocked", e);
-                nowPlayingArtist.textContent = "Kliko play për të dëgjuar";
-            });
+            audioPlayer.play().catch(e => console.warn("Autoplay blocked", e));
         } else {
             audioPlayer.play().catch(e => console.log(e));
         }
 
         currentStationUrl = url;
         currentStationName = name;
-        // Update UI
+
         nowPlayingTrack.textContent = name;
         nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë këngën...`;
         artworkIcon.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
 
-        // Fetch metadata
         fetchCurrentTrack(url, name, true);
         startMetadataInterval();
 
-        // Highlight active button
         document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
     // Country change handler
     countrySelect.addEventListener('change', (e) => {
-        const newCountry = e.target.value;
-        currentCountry = newCountry;
-        showRadios(newCountry);
-        // Stop current stream
+        showRadios(e.target.value);
         audioPlayer.pause();
         audioPlayer.src = '';
         nowPlayingTrack.textContent = 'Zgjidh një radio';
@@ -577,15 +518,9 @@
         stopMetadataInterval();
     });
 
-    // Manual refresh button
     refreshBtn.addEventListener('click', manualRefresh);
+    window.addEventListener('beforeunload', () => stopMetadataInterval());
 
-    // Clean interval on page unload
-    window.addEventListener('beforeunload', () => {
-        if (metadataInterval) clearInterval(metadataInterval);
-    });
-
-    // Initialize
     loadRadios();
 </script>
 </body>
