@@ -1,68 +1,181 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="UTF-8">
-<title>Radio Player</title>
-<style>
-body { font-family: Arial, sans-serif; margin: 20px; }
-h2 { margin-top: 30px; }
-.radio-list { margin-bottom: 20px; }
-button { margin: 5px 0; padding: 8px 12px; cursor: pointer; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Player Moderne</title>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 30px; }
+
+        /* Stilimi i Select */
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--card);
+            color: white;
+            border: 1px solid var(--primary);
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        /* Playeri i radios */
+        .player-section {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-bottom: 4px solid var(--primary);
+            width: 100%;
+        }
+
+        audio { width: 100%; margin-top: 10px; }
+
+        /* Lista e radiove */
+        #radioContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            width: 100%;
+        }
+
+        .radio-btn {
+            background: var(--card);
+            color: white;
+            border: 1px solid #30475e;
+            padding: 15px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .radio-btn:hover {
+            background: var(--primary);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .radio-btn.active {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .now-playing {
+            font-size: 0.9em;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
-<h1>Radio Player</h1>
 
-<select id="countrySelect">
-    <option value="">Zgjidh vendin</option>
-</select>
+<div class="container">
+    <h1>Radio Player 📻</h1>
 
-<div id="radioContainer"></div>
+    <div class="player-section">
+        <div class="now-playing" id="currentTitle">Zgjidhni një radio...</div>
+        <audio id="audioPlayer" controls autoplay>
+            Browseri juaj nuk mbështet elementin audio.
+        </audio>
+    </div>
+
+    <select id="countrySelect">
+        <option value="">🌍 Zgjidh vendin</option>
+    </select>
+
+    <div id="radioContainer"></div>
+</div>
 
 <script>
-// Load radios.json
+const audioPlayer = document.getElementById('audioPlayer');
+const currentTitle = document.getElementById('currentTitle');
+
+// Ngarkimi i të dhënave
 async function loadRadios() {
-    const res = await fetch('radios.json');
-    const data = await res.json();
-    return data;
+    try {
+        const res = await fetch('radios.json');
+        return await res.json();
+    } catch (e) {
+        console.error("Gabim në ngarkimin e radios.json", e);
+        return {};
+    }
 }
 
-function createButton(name, url) {
-    const btn = document.createElement('button');
-    btn.textContent = name;
-    btn.onclick = () => {
-        window.open(url); // hap në VLC/MX Player
-    };
-    return btn;
+function playRadio(name, url, btn) {
+    // Ndrysho burimin e audios
+    audioPlayer.src = url;
+    audioPlayer.play();
+    
+    // Update tekstin
+    currentTitle.textContent = "Duke luajtur: " + name;
+
+    // Hiq klasën 'active' nga butonat e tjerë
+    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    // Shto klasën 'active' te butoni aktual
+    btn.classList.add('active');
 }
 
 function populateCountries(radios) {
     const select = document.getElementById('countrySelect');
-    for (const country in radios) {
+    Object.keys(radios).forEach(country => {
         const option = document.createElement('option');
         option.value = country;
         option.textContent = country;
         select.appendChild(option);
-    }
+    });
 }
 
 function showRadios(radios, country) {
     const container = document.getElementById('radioContainer');
     container.innerHTML = '';
+    
     if (!country || !radios[country]) return;
-    const list = document.createElement('div');
-    list.className = 'radio-list';
+
     radios[country].forEach(([name, url]) => {
-        const btn = createButton(name, url);
-        list.appendChild(btn);
-        list.appendChild(document.createElement('br'));
+        const btn = document.createElement('button');
+        btn.className = 'radio-btn';
+        btn.textContent = name;
+        btn.onclick = () => playRadio(name, url, btn);
+        container.appendChild(btn);
     });
-    container.appendChild(list);
 }
 
 async function init() {
     const radios = await loadRadios();
     populateCountries(radios);
+    
     const select = document.getElementById('countrySelect');
     select.addEventListener('change', () => {
         showRadios(radios, select.value);
@@ -71,5 +184,6 @@ async function init() {
 
 init();
 </script>
+
 </body>
 </html>
