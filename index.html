@@ -31,7 +31,6 @@
 
         h1 { color: var(--primary); margin-bottom: 30px; }
 
-        /* Stilimi i Select */
         select {
             width: 100%;
             padding: 12px;
@@ -44,7 +43,6 @@
             outline: none;
         }
 
-        /* Playeri i radios */
         .player-section {
             background: var(--card);
             padding: 20px;
@@ -56,7 +54,6 @@
 
         audio { width: 100%; margin-top: 10px; }
 
-        /* Lista e radiove */
         #radioContainer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -97,6 +94,11 @@
             color: var(--primary);
             margin-bottom: 5px;
         }
+
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -116,73 +118,79 @@
     </select>
 
     <div id="radioContainer"></div>
+    <div id="errorMessage" class="error"></div>
 </div>
 
 <script>
 const audioPlayer = document.getElementById('audioPlayer');
 const currentTitle = document.getElementById('currentTitle');
+const countrySelect = document.getElementById('countrySelect');
+const radioContainer = document.getElementById('radioContainer');
+const errorDiv = document.getElementById('errorMessage');
 
-// Ngarkimi i të dhënave
+let radiosData = {}; // do të mbushet nga JSON
+
+// Ngarko të dhënat nga radios.json
 async function loadRadios() {
     try {
-        const res = await fetch('radios.json');
-        return await res.json();
-    } catch (e) {
-        console.error("Gabim në ngarkimin e radios.json", e);
-        return {};
+        const response = await fetch('radios.json');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        radiosData = await response.json();
+        populateCountries();
+    } catch (err) {
+        errorDiv.textContent = `Gabim gjatë ngarkimit të radios.json: ${err.message}. Kontrollo që skedari ekziston dhe është i vlefshëm.`;
+        console.error(err);
     }
 }
 
-function playRadio(name, url, btn) {
-    // Ndrysho burimin e audios
-    audioPlayer.src = url;
-    audioPlayer.play();
-    
-    // Update tekstin
-    currentTitle.textContent = "Duke luajtur: " + name;
-
-    // Hiq klasën 'active' nga butonat e tjerë
-    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
-    // Shto klasën 'active' te butoni aktual
-    btn.classList.add('active');
-}
-
-function populateCountries(radios) {
-    const select = document.getElementById('countrySelect');
-    Object.keys(radios).forEach(country => {
+// Popullo dropdown-in me vendet
+function populateCountries() {
+    countrySelect.innerHTML = '<option value="">🌍 Zgjidh vendin</option>';
+    Object.keys(radiosData).forEach(country => {
         const option = document.createElement('option');
         option.value = country;
         option.textContent = country;
-        select.appendChild(option);
+        countrySelect.appendChild(option);
     });
 }
 
-function showRadios(radios, country) {
-    const container = document.getElementById('radioContainer');
-    container.innerHTML = '';
-    
-    if (!country || !radios[country]) return;
+// Shfaq butonat e radiosh për vendin e zgjedhur
+function showRadios(country) {
+    radioContainer.innerHTML = '';
+    if (!country || !radiosData[country]) return;
 
-    radios[country].forEach(([name, url]) => {
+    radiosData[country].forEach(([name, url]) => {
         const btn = document.createElement('button');
         btn.className = 'radio-btn';
         btn.textContent = name;
         btn.onclick = () => playRadio(name, url, btn);
-        container.appendChild(btn);
+        radioContainer.appendChild(btn);
     });
 }
 
-async function init() {
-    const radios = await loadRadios();
-    populateCountries(radios);
-    
-    const select = document.getElementById('countrySelect');
-    select.addEventListener('change', () => {
-        showRadios(radios, select.value);
+// Luaj radion
+function playRadio(name, url, btn) {
+    audioPlayer.src = url;
+    audioPlayer.play().catch(e => {
+        console.warn("Autoplay i bllokuar:", e);
+        currentTitle.textContent = `Kliko 'Play' për të dëgjuar: ${name}`;
     });
+    currentTitle.textContent = `Duke luajtur: ${name}`;
+
+    // Hiq klasën active nga të gjithë butonat
+    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 }
 
-init();
+// Kur ndryshon vendi
+countrySelect.addEventListener('change', (e) => {
+    showRadios(e.target.value);
+});
+
+// Fillo aplikacionin
+loadRadios();
 </script>
 
 </body>
