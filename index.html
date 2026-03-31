@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Wave Radio | Player HD</title>
+    <title>Wave Radio | Artist Image</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -88,16 +88,26 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .artwork {
+        .artist-image {
             width: 70px;
             height: 70px;
+            border-radius: 1.2rem;
+            object-fit: cover;
             background: linear-gradient(135deg, #1e293b, #0f172a);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-glow);
+            transition: var(--transition);
+        }
+
+        .fallback-icon {
+            width: 70px;
+            height: 70px;
             border-radius: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             border: 1px solid var(--border-glow);
         }
 
@@ -267,7 +277,7 @@
         @media (max-width: 560px) {
             .stations-grid { grid-template-columns: 1fr 1fr; }
             .now-playing-card { margin: 1rem; padding: 0.9rem; }
-            .artwork { width: 55px; height: 55px; font-size: 1.5rem; }
+            .artist-image, .fallback-icon { width: 55px; height: 55px; font-size: 1.5rem; }
             .track-name { font-size: 1rem; }
         }
     </style>
@@ -277,11 +287,14 @@
     <div class="glass-card">
         <div class="app-header">
             <div class="logo"><i class="fas fa-waveform"></i> WAVE RADIO</div>
-            <div class="tagline">HD Radio · Artist & kënga në kohë reale</div>
+            <div class="tagline">HD Radio · Artist & kënga + Foto artisti</div>
         </div>
 
         <div class="now-playing-card">
-            <div class="artwork" id="artworkIcon"><i class="fas fa-headphones"></i></div>
+            <div id="artistImageContainer">
+                <div class="fallback-icon" id="artistFallback"><i class="fas fa-headphones"></i></div>
+                <img id="artistImage" class="artist-image" style="display: none;" alt="Foto artisti">
+            </div>
             <div class="track-info">
                 <div class="track-label">TANI NË AJËR</div>
                 <div class="track-name" id="nowPlayingTrack">Zgjidh një radio</div>
@@ -312,7 +325,7 @@
 
         <div id="errorMessage" class="error-msg" style="display: none;"></div>
         <div class="footer-note">
-            <i class="fas fa-music"></i> Informacioni merret nga Radio Browser API • Përditësohet çdo 30 sekonda
+            <i class="fas fa-music"></i> Informacioni merret nga Radio Browser API • Foto artisti nga Deezer
         </div>
     </div>
 </div>
@@ -327,7 +340,8 @@
     const stationCountSpan = document.getElementById('stationCount');
     const errorDiv = document.getElementById('errorMessage');
     const refreshBtn = document.getElementById('refreshMetadataBtn');
-    const artworkIcon = document.getElementById('artworkIcon');
+    const artistImage = document.getElementById('artistImage');
+    const artistFallback = document.getElementById('artistFallback');
 
     let radiosData = {};
     let currentStationUrl = '';
@@ -347,9 +361,44 @@
         ]
     };
 
+    // ========== DEEZER JSONP ==========
+    function loadArtistImage(artistName) {
+        if (!artistName) return;
+
+        // Clean artist name for search
+        let cleanArtist = artistName.replace(/\(.*?\)|\[.*?\]|[^a-zA-Z0-9 ]/g, "").trim();
+        if (!cleanArtist) return;
+
+        // Remove old script to avoid multiple calls
+        const oldScript = document.getElementById("deezerScript");
+        if (oldScript) oldScript.remove();
+
+        const script = document.createElement("script");
+        script.id = "deezerScript";
+        script.src = `https://api.deezer.com/search/artist?q=${encodeURIComponent(cleanArtist)}&limit=1&output=jsonp&callback=deezerCallback`;
+        document.body.appendChild(script);
+    }
+
+    // Global callback for Deezer JSONP
+    window.deezerCallback = function(data) {
+        if (data && data.data && data.data.length > 0 && data.data[0].picture_medium) {
+            const imgUrl = data.data[0].picture_medium;
+            artistImage.src = imgUrl;
+            artistImage.style.display = "block";
+            artistFallback.style.display = "none";
+        } else {
+            // No image found, show fallback
+            artistImage.style.display = "none";
+            artistFallback.style.display = "flex";
+        }
+        // Clean up script after execution
+        const script = document.getElementById("deezerScript");
+        if (script) script.remove();
+    };
+
     // ========== METADATA FETCH (multiple servers) ==========
     async function fetchMetadataFromAPI(stationUrl) {
-        const servers = ['de1', 'nl1', 'fr1']; // different Radio Browser mirrors
+        const servers = ['de1', 'nl1', 'fr1'];
         for (const server of servers) {
             try {
                 const encodedUrl = encodeURIComponent(stationUrl);
@@ -371,39 +420,53 @@
 
         if (showLoading) {
             nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë të dhëna...`;
-            artworkIcon.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+            artistImage.style.display = "none";
+            artistFallback.style.display = "flex";
+            artistFallback.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
         }
 
         try {
             const stationData = await fetchMetadataFromAPI(stationUrl);
             if (stationData && stationData.song) {
                 let song = stationData.song;
+                let artist = null;
+                let title = null;
+
                 // Try to split artist - title
                 if (song.includes(' - ')) {
-                    const [artist, title] = song.split(' - ');
-                    nowPlayingArtist.textContent = artist.trim();
-                    nowPlayingTrack.textContent = title.trim() || stationName;
+                    [artist, title] = song.split(' - ');
                 } else if (song.includes(' – ')) {
-                    const [artist, title] = song.split(' – ');
+                    [artist, title] = song.split(' – ');
+                }
+
+                if (artist && title) {
                     nowPlayingArtist.textContent = artist.trim();
-                    nowPlayingTrack.textContent = title.trim() || stationName;
+                    nowPlayingTrack.textContent = title.trim();
+                    // Load artist image from Deezer
+                    loadArtistImage(artist.trim());
                 } else {
                     // If no separator, show whole string as title
                     nowPlayingTrack.textContent = song;
                     nowPlayingArtist.textContent = stationName;
+                    artistImage.style.display = "none";
+                    artistFallback.style.display = "flex";
+                    artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
                 }
-                artworkIcon.innerHTML = '<i class="fas fa-music"></i>';
             } else {
                 // No metadata from API
                 nowPlayingTrack.textContent = stationName;
                 nowPlayingArtist.textContent = "🎵 Informacion në dispozicion?";
-                artworkIcon.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+                artistImage.style.display = "none";
+                artistFallback.style.display = "flex";
+                artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
             }
         } catch (err) {
             console.error("Metadata fetch error:", err);
             nowPlayingTrack.textContent = stationName;
             nowPlayingArtist.textContent = "⚠️ Nuk mund të merrej kënga";
-            artworkIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            artistImage.style.display = "none";
+            artistFallback.style.display = "flex";
+            artistFallback.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
         }
     }
 
@@ -496,7 +559,9 @@
 
         nowPlayingTrack.textContent = name;
         nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë këngën...`;
-        artworkIcon.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+        artistImage.style.display = "none";
+        artistFallback.style.display = "flex";
+        artistFallback.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
 
         fetchCurrentTrack(url, name, true);
         startMetadataInterval();
@@ -512,7 +577,9 @@
         audioPlayer.src = '';
         nowPlayingTrack.textContent = 'Zgjidh një radio';
         nowPlayingArtist.textContent = '—';
-        artworkIcon.innerHTML = '<i class="fas fa-headphones"></i>';
+        artistImage.style.display = "none";
+        artistFallback.style.display = "flex";
+        artistFallback.innerHTML = '<i class="fas fa-headphones"></i>';
         document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
         currentStationUrl = '';
         stopMetadataInterval();
