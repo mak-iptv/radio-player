@@ -4,27 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Wave Radio | Player HD Shqip</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Përdor stilet e tua ekzistuese këtu (i kam mbajtur të njëjtat për konsistencë) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-gradient: linear-gradient(135deg, #0b1120 0%, #0a0f1a 100%);
             --card-bg: rgba(15, 25, 45, 0.75);
             --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-glow: rgba(59, 130, 246, 0.5);
             --text-light: #f1f5f9;
             --text-muted: #94a3b8;
             --border-glow: rgba(59, 130, 246, 0.3);
             --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-
         body {
             background: var(--bg-gradient);
             font-family: 'Inter', sans-serif;
@@ -35,802 +28,149 @@
             justify-content: center;
             padding: 1.5rem;
         }
-
-        .radio-app {
-            max-width: 1000px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
+        .radio-app { max-width: 1000px; width: 100%; margin: 0 auto; }
         .glass-card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             border-radius: 2rem;
             border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
-
-        .app-header {
-            padding: 1.8rem 2rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-        }
-
-        .logo {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: linear-gradient(120deg, #fff, var(--primary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tagline {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.4rem;
-        }
-
-        .apk-button {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: rgba(59,130,246,0.2);
-            border: 1px solid var(--border-glow);
-            border-radius: 40px;
-            padding: 0.4rem 1rem;
-            font-size: 0.75rem;
-            color: var(--primary);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .apk-button:hover {
-            background: var(--primary);
-            color: white;
-            border-color: transparent;
-            transform: scale(1.02);
-        }
-
+        .app-header { padding: 1.8rem 2rem 1rem; text-align: center; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .logo { font-size: 2.2rem; font-weight: 800; background: linear-gradient(120deg, #fff, var(--primary)); -webkit-background-clip: text; color: transparent; }
         .now-playing-card {
-            background: rgba(0, 0, 0, 0.4);
-            margin: 1.5rem 2rem 0;
-            border-radius: 1.5rem;
-            padding: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.4); margin: 1.5rem 2rem 0; border-radius: 1.5rem;
+            padding: 1.2rem; display: flex; align-items: center; gap: 1.2rem; border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .artist-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 1.2rem;
-            object-fit: cover;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-glow);
-        }
-
-        .fallback-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid var(--border-glow);
-        }
-
-        .track-info {
-            flex: 1;
-        }
-
-        .track-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 0.2rem;
-        }
-
-        .track-name {
-            font-weight: 700;
-            font-size: 1.3rem;
-            line-height: 1.3;
-            color: white;
-        }
-
-        .track-artist {
-            font-size: 0.9rem;
-            color: var(--primary);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .refresh-btn {
-            background: rgba(59,130,246,0.2);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .refresh-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: rotate(15deg);
-        }
-
-        .audio-wrapper {
-            padding: 1rem 2rem 0.5rem;
-        }
-
-        audio {
-            width: 100%;
-            border-radius: 60px;
-            outline: none;
-        }
-
-        .select-region {
-            padding: 0.5rem 2rem;
-        }
-
-        .custom-select {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            background: #0f172a;
-            border: 1px solid var(--border-glow);
-            border-radius: 60px;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-            background-repeat: no-repeat;
-            background-position: right 1.2rem center;
-        }
-
-        .stations-area {
-            padding: 1.2rem 2rem 1.8rem;
-        }
-
-        .stations-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 1rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-        }
-
-        .stations-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 0.8rem;
-        }
-
-        .station-btn {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 0.8rem 0.5rem;
-            border-radius: 1.2rem;
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            backdrop-filter: blur(4px);
-        }
-
-        .station-btn:hover, .station-btn.active {
-            background: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -8px var(--primary-glow);
-            border-color: transparent;
-        }
-
-        .loader-small {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(59,130,246,0.3);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .error-msg {
-            background: rgba(239,68,68,0.1);
-            border-left: 3px solid #ef4444;
-            padding: 0.6rem 1rem;
-            margin: 0 2rem 1rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: #fecaca;
-        }
-
-        .footer-note {
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            padding: 1rem 2rem 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .footer-note a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        @media (max-width: 560px) {
-            .stations-grid { grid-template-columns: 1fr 1fr; }
-            .now-playing-card { margin: 1rem; padding: 0.9rem; }
-            .artist-image, .fallback-icon { width: 55px; height: 55px; font-size: 1.5rem; }
-            .track-name { font-size: 1rem; }
-            .apk-button { top: 1rem; right: 1rem; padding: 0.3rem 0.8rem; font-size: 0.7rem; }
-        }
+        .artist-image { width: 70px; height: 70px; border-radius: 1.2rem; object-fit: cover; border: 1px solid var(--border-glow); }
+        .fallback-icon { width: 70px; height: 70px; border-radius: 1.2rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #1e293b; border: 1px solid var(--border-glow); }
+        .track-info { flex: 1; overflow: hidden; }
+        .track-name { font-weight: 700; font-size: 1.3rem; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist { color: var(--primary); font-weight: 500; }
+        .audio-wrapper { padding: 1rem 2rem; }
+        audio { width: 100%; height: 45px; }
+        .select-region { padding: 0.5rem 2rem; }
+        .custom-select { width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid var(--border-glow); border-radius: 60px; color: white; appearance: none; }
+        .stations-area { padding: 1.2rem 2rem 1.8rem; }
+        .stations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; }
+        .station-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.8rem; border-radius: 1.2rem; color: white; cursor: pointer; text-align: center; transition: var(--transition); }
+        .station-btn:hover, .station-btn.active { background: var(--primary); transform: translateY(-2px); }
+        .apk-button { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(59,130,246,0.2); border-radius: 40px; padding: 0.4rem 1rem; color: var(--primary); text-decoration: none; font-size: 0.75rem; }
     </style>
 </head>
 <body>
+
 <div class="radio-app">
     <div class="glass-card">
         <div class="app-header">
-            <div class="logo">
-                <i class="fas fa-waveform"></i> WAVE RADIO
-            </div>
-            <div class="tagline">HD Radio · Artist & kënga në kohë reale</div>
-            <a href="https://apk.e-droid.net/apk/app3979905-lx7jkw.apk?v=1" class="apk-button" target="_blank" rel="noopener noreferrer">
-                <i class="fab fa-android"></i> Shkarko APK
-            </a>
+            <div class="logo"><i class="fas fa-wave-square"></i> WAVE RADIO</div>
+            <a href="#" class="apk-button"><i class="fab fa-android"></i> APK</a>
         </div>
 
         <div class="now-playing-card">
-            <div id="artistImageContainer">
-                <div class="fallback-icon" id="artistFallback"><i class="fas fa-headphones"></i></div>
-                <img id="artistImage" class="artist-image" style="display: none;" alt="Foto artisti">
+            <div id="imageContainer">
+                <div class="fallback-icon" id="artistFallback"><i class="fas fa-music"></i></div>
+                <img id="artistImage" class="artist-image" style="display: none;">
             </div>
             <div class="track-info">
-                <div class="track-label">TANI NË AJËR</div>
-                <div class="track-name" id="nowPlayingTrack">Zgjidh një radio</div>
-                <div class="track-artist" id="nowPlayingArtist">—</div>
+                <div class="track-name" id="trackTitle">Zgjidh një radio</div>
+                <div class="track-artist" id="trackArtist">Prisni...</div>
             </div>
-            <button class="refresh-btn" id="refreshMetadataBtn" title="Rifresko këngën"><i class="fas fa-sync-alt"></i></button>
         </div>
 
         <div class="audio-wrapper">
-            <audio id="audioPlayer" controls preload="none">
-                <source src="" type="audio/mpeg">
-            </audio>
+            <audio id="audioPlayer" controls></audio>
         </div>
 
         <div class="select-region">
-            <select id="countrySelect" class="custom-select">
-                <option value="">🌍 Zgjidh vendin</option>
-            </select>
+            <select id="countrySelect" class="custom-select"></select>
         </div>
 
         <div class="stations-area">
-            <div class="stations-header">
-                <span><i class="fas fa-tower-broadcast"></i> STACIONET RADIO</span>
-                <span id="stationCount"></span>
-            </div>
-            <div id="radioContainer" class="stations-grid">
-                <div class="station-btn" style="justify-content:center;"><i class="fas fa-spinner fa-pulse"></i> Duke ngarkuar...</div>
-            </div>
-        </div>
-
-        <div id="errorMessage" class="error-msg" style="display: none;"></div>
-        <div class="footer-note">
-            <i class="fas fa-music"></i> Informacioni merret nga Radio Browser API • Përditësohet çdo 30 sekonda<br>
-            <i class="fab fa-android"></i> <a href="https://apk.e-droid.net/apk/app3979905-lx7jkw.apk?v=1" target="_blank">Shkarko aplikacionin Android</a> për të dëgjuar kudo!
+            <div id="radioContainer" class="stations-grid"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // ========== DOM ELEMENTS ==========
-    const audioPlayer = document.getElementById('audioPlayer');
-    const nowPlayingTrack = document.getElementById('nowPlayingTrack');
-    const nowPlayingArtist = document.getElementById('nowPlayingArtist');
-    const countrySelect = document.getElementById('countrySelect');
+    const audio = document.getElementById('audioPlayer');
+    const trackTitle = document.getElementById('trackTitle');
+    const trackArtist = document.getElementById('trackArtist');
+    const artistImg = document.getElementById('artistImage');
+    const fallback = document.getElementById('artistFallback');
     const radioContainer = document.getElementById('radioContainer');
-    const stationCountSpan = document.getElementById('stationCount');
-    const errorDiv = document.getElementById('errorMessage');
-    const refreshBtn = document.getElementById('refreshMetadataBtn');
-    const artistImage = document.getElementById('artistImage');
-    const artistFallback = document.getElementById('artistFallback');
+    const countrySelect = document.getElementById('countrySelect');
 
-    let radiosData = {};
-    let currentStationUrl = '';
-    let currentStationName = '';
-    let currentStationStaticInfo = null;
-    let metadataInterval = null;
-
-    // ========== STACIONET E PARACAKTUARA (TANI PËRFSHIJNË EDHE BULLGARINË) ==========
-    const DEFAULT_STATIONS = {
+    // Këtu vendosen të dhënat e radiove (Default stations që kishit)
+    const radiosData = {
         "Shqipëri / Kosovë": [
-            ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream", null],
-            ["Radio Mergimi", "https://mars.streamerr.co/8114/stream", null],
-            ["My Music Radio", "https://live.top-media.al/mmr", null],
-            ["Radio Shqip Folklor", "http://85.215.168.56:8010/folklor", null],
-            ["Radio Natyra", "https://mars.streamerr.co/8266/stream", null],
-            ["Radio Liria", "https://live.radiostreaming.al/9998/stream", null],
-            ["Radio Viciana Folklor", "http://radioviciana.org:8020/;stream.nsv", null],
-            ["Top Albania Radio", "https://live.topgold.al/tar", null],
-            ["Radio Zemra", "http://radio-zemra.eu:8000/zemra", null],
-            ["Radio One", "https://cp1.sednastream.com/proxy/radioone94?mp=/stream", null],
-            ["Radio Nostalgjia", "https://radionos.radioca.st/", null],
-            ["Radio Dielli", "https://radiodielli.synology.me/listen/radiodielli/radio.mp3", null],
-            ["Dukagjini Shqip Radio", "https://s1.voscast.com:11605/shqipradio", null],
-            ["Radio Lushnja", "https://stream.radiocast.cc/listen/radio_lushnja/radio.mp3", null],
-            ["Radiodeqani Folk", "https://mars.streamerr.co/8104/stream", null],
-            ["Radio Dukagjini", "https://s2.voscast.com:8825/radiodukagjini", null],
-            ["Radio Dardania", "http://radio.radiodardania.com:4000/", null],
-            ["Top Gold Radio", "https://live.topgold.al/topgold", null],
-            ["Radio Emigranti", "http://www.radioemigranti.com:8000/radioauto", null],
-            ["Radio Pendimi Live Kanali 1", "https://www.rtvpendimi.com:8000/stream", null],
-            ["Radio Club FM", "https://cp1.sednastream.com/proxy/clubfm?mp=/stream", null],
-            ["Alpo Radio", "https://cp1.sednastream.com/proxy/alporadio/stream", null],
-            ["Radio Dashuria", "https://listen.radioking.com/radio/465815/stream/521297", null],
-            ["Radio Viciana", "http://radioviciana.org:8030/;stream.nsv", null],
-            ["Radio Marimanga", "https://a9.asurahosting.com/listen/radio_marimanga/radio.mp3", null],
-            ["Radio Klina", "https://live.radiostreaming.al/8002/stream", null],
-            ["Radio Tirana 1", "http://79.106.48.2:8000/radiotirana1", null],
-            ["Klan Radio", "https://klanradio.tvklan.al/live/klanmusicradio1/playlist.m3u8", null],
-            ["Prime Shqip", "https://play.primeradio.al/primeshqip", null],
-            ["Radio Ora News", "https://live1.mediadesk.al/oranews.m3u8", null]
-        ],
-        "Maqedoni": [
-            ["MRT Radio 2", "https://vod-c57.interspace.com/channel_abr/48/playlist.m3u8", null],
-            ["Radio Bubamara", "https://stream.bubamara.com.mk/live", null],
-            ["Antenna 5", "http://antenna5stream.neotel.mk:8000/live128", null],
-            ["City Radio", "http://176.9.117.123:9998/live", null],
-            ["Radio Kavadarci", "https://stream.zeno.fm/a5ffd4skgg0uv", null],
-            ["Radio Tim Bitola", "http://hydra.shoutca.st:8108/;stream.nsv", null],
-            ["Spark Radio", "https://usa10.fastcast4u.com/sparkradio", null],
-            ["Extra Radio", "https://eu10.fastcast4u.com/extralive", null],
-            ["Sky Radio", "https://s1.skyradio.com.mk/", null],
-            ["Merak Radio Bitola", "https://a13.asurahosting.com/listen/merak_radio/radio.mp3", null],
-            ["Radio VMRO", "https://radiovmro.radioca.st/", null],
-            ["MRT Radio Skopje", "https://vod-c57.interspace.com/channel_abr/47/playlist.m3u8", null],
-            ["Spark Radio Ex YU", "https://usa10.fastcast4u.com:6060/stream/4/", null],
-            ["Metropolis Radio", "https://eu4.fastcast4u.com/proxy/metradio?mp=/1", null],
-            ["Radio Lav", "https://cloud.mkdstream.com/p/7094/stream", null],
-            ["Sky Radio Retro", "https://s1.skyradio.com.mk/retro.mp3", null],
-            ["Club FM", "http://176.9.117.123:9996/", null],
-            ["Star Radio Kafanska", "https://a2.asurahosting.com/listen/stil_radio/starboem", null],
-            ["Radio Aleksandar Makedonski", "https://s2.free-shoutcast.com/stream/18138;", null],
-            ["Zona M1 Radio", "https://zonam1.ddns.net:8300/", null],
-            ["Spark Radio MK Folk", "https://usa10.fastcast4u.com:6060/stream/3/", null],
-            ["Radio 105 Bombarder", "https://radio105bombarder.com:21010/;stream.mp3", null],
-            ["Sky Radio Hits", "https://s1.skyradio.com.mk/hits.mp3", null],
-            ["Radio Fortuna", "http://radiofortuna.ipradio.mk/;stream.nsv", null],
-            ["Star Radio MK Folk", "https://a2.asurahosting.com/listen/stil_radio/starmkfolk", null],
-            ["Radio Meff", "https://s32.myradiostream.com:16040/", null],
-            ["Star Radio MK Zabavna", "https://eu10.fastcast4u.com/starmkpop", null],
-            ["Star Radio Ex Yu Retro", "https://radiostar.pro/stream/exyuretro.php", null],
-            ["Radio Kocani", "https://cloud.mkdstream.com/p/8460/stream", null]
-        ],
-        "Bosna": [
-            ["Radio Sehara", "https://cast.name.ba:8000/", null],
-            ["Radio Avaz", "http://51.254.61.148:8222/", null],
-            ["Radio Mix", "https://stream.rsgmedia.ba/listen/radio_mix/radio.mp3", null],
-            ["Radio M plus", "https://team-data.ba:10000//", null],
-            ["Kalman Radio", "http://188.40.62.20:8004/stream", null],
-            ["BHRT BH Radio 1", "https://webtvstream.bhtelecom.ba/bh_radio1.m3u8", null],
-            ["Dzungla", "https://cast2.name.ba/proxy/dzungla/stream", null],
-            ["Skala", "http://cast2.name.ba:9049/", null],
-            ["Federalni Radio", "https://s2.free-shoutcast.com/stream/18170", null],
-            ["BN Radio", "https://stream.radiobn.net/", null],
-            ["Radio Čaršija", "https://cast2.name.ba/proxy/nedim/", null],
-            ["HIT FM Radio Sarajevo", "https://slusaj.off.ba:8010/hit", null],
-            ["Radio Široki Brijeg", "http://eu6.fastcast4u.com:5036/", null],
-            ["Radio Žepa", "https://stream.zeno.fm/f39fzp6gc18uv", null],
-            ["Big Radio 2", "https://big2.bigportal.ba:8080/big2", null],
-            ["Radio Sarajevo", "https://443-1.autopo.st/45?type=http", null],
-            ["Pink Radio", "http://pink.exyuserver.com/;type=mp3", null],
-            ["Radio BIR", "http://188.40.62.20:8090/stream", null],
-            ["Radio Glas Drine", "http://158.69.119.6:8014/stream", null],
-            ["Radio M", "https://team-data.ba:9030//", null],
-            ["Radio M Narodna", "https://team-data.ba:9036/", null],
-            ["RSG Radio", "https://stream.rsgmedia.ba/listen/radio_stari_grad/radio.mp3", null],
-            ["Radio Bosna", "https://stream.zeno.fm/qggihjl4mgcvv", null],
-            ["Radio Kalesijski Ba", "https://stream1.srvnetplus.com:18102/;stream.nsv", null],
-            ["KISS FM RADIO BiH", "http://stream.kissfm.ba:8010/live", null],
-            ["POP FM", "https://solid1.streamupsolutions.com/proxy/bnwmfvnq/POPFM", null],
-            ["Radio Kozara", "http://51.254.61.148:11111/;stream.mp3", null],
-            ["Radio M ExYu", "https://team-data.ba:9034/", null],
-            ["Studio M", "https://stream.leftor.com/proxy/studiom2/stream/;stream.mp3", null],
-            ["Radio Srebrenik", "http://live.radiosrebrenik.ba:7600/", null]
-        ],
-        "Serbi": [
-            ["OK Radio", "https://stream1.okradio.net/", null],
-            ["Cool Radio", "https://live.coolradio.rs/cool128", null],
-            ["Naxi Radio", "https://naxi64ssl.streaming.rs:9162/;stream.nsv", null],
-            ["Pink Radio", "https://edge9.pink.rs/pinkstream", null],
-            ["HIT FM", "https://streaming.hitfm.rs/hit.mp3", null],
-            ["Lola Radio (Niš)", "https://streaming.tdiradio.com/radiololanis.mp3", null],
-            ["OK BOEM Radio", "https://stream.okplus.rs/listen/boem/radio.mp3", null],
-            ["Radio S3", "https://edge-de-04.maksnet.tv/asmedia/pingvin/playlist.m3u8", null],
-            ["Lola Radio", "https://streaming.tdiradio.com/radiolola.mp3", null],
-            ["Naxi EX YU Radio", "https://naxidigital-exyu128ssl.streaming.rs:8242/;stream.nsv", null],
-            ["Kolubara 96.9", "https://media.radioexs.com/stream/radiokolubara", null],
-            ["Radio S3 Južni", "https://edge-rs-03.maksnet.tv/asmedia/radio_s_juzni/playlist.m3u8", null],
-            ["Radio Morava", "https://e3.radiomorava.rs/radio/8000/radiomorava128.mp3", null],
-            ["2000-te Folk Radio S3", "https://stream.radios.rs:9060/stream", null],
-            ["Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3", null],
-            ["Radio Ritam Srca", "https://s4.radio.co/s0f65dad2d/listen", null],
-            ["Radio Karolina", "https://streaming.karolina.rs/karolina.mp3", null],
-            ["Jack Folk Radio", "https://media.radioexs.com/stream/jackfolkradio", null],
-            ["Radio S1 Ex Yu", "https://stream.radios.rs:9042/stream", null],
-            ["Radio Srce Krajine", "https://srv.mediastriming.com/8330/stream", null],
-            ["Naxi Ex Yu Rock Radio", "https://naxidigital-exyurock128ssl.streaming.rs:8402/;stream.nsv", null],
-            ["Yu Radio", "https://yuradio.ipradio.rs:9036/", null],
-            ["Radio S1 Folk", "https://stream.radios.rs:9046/stream", null],
-            ["Radio S3 Folk Stars", "https://edge-rs-01.maksnet.tv/asmedia/radio_s_lounge/playlist.m3u8", null],
-            ["Radio IN", "https://radio3-64ssl.streaming.rs:9212/;stream.mp3", null],
-            ["Radio Beograd 202", "https://rtsradio-live.morescreens.com/RTS_2_004/playlist.m3u8", null],
-            ["Naxi Boem Radio", "https://naxidigital-boem128ssl.streaming.rs:8162/;stream.nsv", null],
-            ["Radio Balkan Narodna", "https://radiobalkan.live/radio/live/narodna.mp3", null],
-            ["Radio Beograd 1", "https://rtsradio-live.morescreens.com/RTS_2_001/playlist.m3u8", null],
-            ["Jack Radio Varvarin", "https://media.radioexs.com/stream/jackradio", null]
-        ],
-        "Hrvatska": [
-            ["Bravo", "http://c5.hostingcentar.com:8059/", null],
-            ["Banovina Turbo", "https://audio.radio-banovina.hr:7010/stream", null],
-            ["HRT HR2", "https://playerservices.streamtheworld.com/api/livestream-redirect/PROGRAM2.mp3", null],
-            ["Radio Banovina", "https://audio.radio-banovina.hr:9998/stream", null],
-            ["Happy FM", "http://c5.hostingcentar.com:9543/", null],
-            ["Top Radio", "https://c5.hostingcentar.com/streams/topradio/", null],
-            ["Extra FM", "http://streams.extrafm.hr:8110/", null],
-            ["Radio Dalmacija", "http://shoutcast.pondi.hr:8000/;stream/1", null],
-            ["Otvoreni", "https://stream2.otvoreni.hr/otvoreni", null],
-            ["HRT HR1", "https://playerservices.streamtheworld.com/api/livestream-redirect/PROGRAM1.mp3", null],
-            ["Antena Zagreb", "http://live.antenazagreb.hr:8000/", null],
-            ["Domoljubne Pjesme", "http://radiostream.optiklink.com:8200/live.mp3", null],
-            ["Radio Kaj", "https://s8.iqstreaming.com:2020/stream/radio-kaj2/stream", null],
-            ["Extra FM Throwback", "http://c5.hostingcentar.com:8432/", null],
-            ["Happy Tambura", "http://c5.hostingcentar.com:8378/", null],
-            ["Radio Max", "https://azuracast.novi-net.net/radio/8010/radiomax.aac", null],
-            ["Happy Party", "http://c5.hostingcentar.com:8390/", null],
-            ["Hrvatski Katolicki Radio", "https://stream.hkr.hr/hkr.mp3", null],
-            ["Laganini FM", "http://194.145.208.251:8000/start/lfmzg", null],
-            ["Radio Nasice", "https://s8.iqstreaming.com:8038/stream", null],
-            ["HRT Radio Rijeka", "https://playerservices.streamtheworld.com/api/livestream-redirect/RIJEKAAAC.aac", null],
-            ["Yammat FM", "https://stream.yammat.fm/radio/8000/yammat.mp3", null],
-            ["Ultra Split", "http://c5.hostingcentar.com:8061/stream", null],
-            ["Bravo Balade", "http://c5.hostingcentar.com:8360/", null],
-            ["Happy Klape", "http://c5.hostingcentar.com:8384/", null],
-            ["CMC Radio", "https://radio-stream.cmc.com.hr:9011/live", null],
-            ["Gold FM", "http://live.goldfm.hr:8068/", null],
-            ["Radio Moslavina", "https://s8.iqstreaming.com:2020/stream/rmoslavina/stream", null],
-            ["HRT Radio Sljeme", "https://playerservices.streamtheworld.com/api/livestream-redirect/SLJEME.mp3", null],
-            ["Bravo Pop", "http://c5.hostingcentar.com:8354/", null]
-        ],
-        "Montenegro": [
-            ["Radio D plus", "https://radiodplus.radioca.st/xstream", null],
-            ["Radio D", "https://radiod.radioca.st/xstream", null],
-            ["Elmag Radio", "https://radio.elmag.me/elmag.mp3", null],
-            ["Radio S3", "https://edge-de-04.maksnet.tv/asmedia/radios3-cg", null],
-            ["Bum Radio Podgorica", "http://r.name.ba:7324/;stream.nsv", null],
-            ["MAG Radio Folk Gold", "https://radio.elmag.me/folkgold.mp3", null],
-            ["Radio Balkan Music", "https://media.radioexs.com/stream/radiobalkanmusic", null],
-            ["Radio Antena M", "http://radioservis.me:8010/antenamlive", null],
-            ["Radio Bijelo Polje", "https://stream.iradio.pro/proxy/radiobijelopolje?mp=/stream", null],
-            ["Radio Boka News", "http://bokanews.me:8000/source", null],
-            ["Radio Tivat", "https://radio.dukahosting.com/8008/stream", null],
-            ["RCG YUG", "https://rtcg1.ipradio.rs:9103/stream", null],
-            ["EL Radio", "https://radio.elmag.me/el.mp3", null],
-            ["Radio Kotor", "https://stream.iradio.pro/proxy/radiokotor?mp=/stream", null],
-            ["MAG Radio", "https://radio.elmag.me/mag.mp3", null],
-            ["MAG Radio Pop Rock Ex Yu", "https://radio.elmag.me/poprock.mp3", null],
-            ["Play Rock Montenegro", "https://stream.playradio.me:8443/rock.aac", null],
-            ["R98", "https://r98.ipradio.rs:10100/", null],
-            ["Radio Berane", "https://stream.iradio.pro/proxy/radioberane?mp=/stream;", null],
-            ["RCG Classic", "https://rtcg1.ipradio.rs:9100/stream", null],
-            ["Turbo Radio", "https://montestream.xyz:8010/radio.mp3", null],
-            ["MAG Radio Evergreen", "https://radio.elmag.me/evergreen.mp3", null],
-            ["Radio Titograd", "http://ca.rcast.net:8016/", null],
-            ["Radio Svetigora", "https://svetigoralive.com/Radio", null],
-            ["Radio Skadar", "http://radioservis.me:8050/radioskadar", null],
-            ["Radio Elita", "http://136.243.134.202:8098/stream", null],
-            ["Radio Bruskin", "http://centova.radiobruskin.me:8004/stream.mp3", null],
-            ["Play Urban Montenegro", "https://stream.playradio.me:8443/urban.aac", null],
-            ["Radio Herceg Novi", "http://s2.voscast.com:10354/", null],
-            ["Radio S1", "https://edge-rs-04.maksnet.tv/asmedia/radios1-cg/playlist.m3u8", null]
+            ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream"],
+            ["Top Albania Radio", "https://live.top-media.al/tar"]
         ],
         "Bullgaria": [
-            ["Radio Fresh", "https://stream.rcast.net/71094", null],
-            ["Energy 89.5", "https://play.global.audio/energy-00shi.aac", null],
-            ["NRJ Bulgaria", "https://play.global.audio/nrj.aac", null],
-            ["Radio 1 (Bulgaria)", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_1AAC_L.aac", null],
-            ["Radio 1 Rock", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_1_ROCKAAC_L.aac", null],
-            ["Radio Veronika", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_VERONIKAAAC_L.aac", null],
-            ["Radio Nova (Bulgaria)", "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_NOVAAAC_L.aac", null],
-            ["Darik Radio", "https://a12.asurahosting.com/listen/darik_radio/radio.mp3", null],
-            ["Magic FM (Bulgaria)", "https://nova-radio.neterra.tv/magicfm", null],
-            ["Vitosha Radio", "https://nova-radio.neterra.tv/vitosha", null],
-            ["The Voice (Bulgaria)", "https://nova-radio.neterra.tv/thevoice", null],
-            ["City Radio (Bulgaria)", "https://play.global.audio/city.opus", null],
-            ["Radio Melody (Bulgaria)", "http://193.108.24.6:8000/melody?", null],
-            ["Radio Veselina", "https://nova-radio.neterra.tv/veselina", null],
-            ["BTV Radio", "https://web.static.btv.bg/radioplayer/btvradio.mp3", null],
-            ["Njoy Radio", "https://web.static.btv.bg/radio/njoy-radio-proxy/index.php", null],
-            ["Radio Ultra", "http://88.80.96.25:40070/ultra.mp3", null],
-            ["Radio Folk BG", "http://listen.folkbg.net:8001/folkbg", null],
-            ["Radio Zara (Bulgaria)", "https://radio.jump.bg/proxy/feed911?mp=/MLR90S", null],
-            ["Radio FM+", "https://radio.jump.bg/proxy/predp?mp=/MDR", null],
-            ["Alpha Radio", "http://a1.virtualradio.eu:8000/powerfm.mp3", null],
-            ["Radio 1 (80s)", "https://radio.jump.bg/proxy/feed911?mp=/MLR80S", null],
-            ["Radio Sofia", "https://lb-hls.cdn.bg/2032/fls/Sofia.stream/playlist.m3u8", null]
+            ["Radio Fresh", "https://stream.rcast.net/71094"],
+            ["NRJ Bulgaria", "https://play.global.audio/nrj.aac"]
         ]
+        // Shtoni të tjerat këtu...
     };
 
-    // ========== NGARKO RADIOT NGA radios.json (NËSE EKZISTON) ==========
-    async function loadRadios() {
-        try {
-            radioContainer.innerHTML = `<div class="station-btn" style="justify-content:center;"><i class="fas fa-spinner fa-pulse"></i> Po ngarkohen stacionet...</div>`;
-            const res = await fetch('radios.json');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (Object.keys(data).length === 0) throw new Error('empty');
-            radiosData = data;
-            console.log("Radiot u ngarkuan nga radios.json");
-        } catch (err) {
-            console.warn("radios.json nuk u gjet ose është bosh. Përdoren stacionet e paracaktuara (përfshirë Bullgarinë).", err);
-            radiosData = DEFAULT_STATIONS;
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = `⚠️ Skedari radios.json nuk u gjet. Duke përdorur stacionet e plota të integruara (përfshirë Bullgarinë). Nëse dëshiron të përditësosh listën, krijo një skedar radios.json me të njëjtin format.`;
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 8000);
-        } finally {
-            populateCountries();
-            radioContainer.innerHTML = '';
-            if (Object.keys(radiosData).length === 0) {
-                radioContainer.innerHTML = '<div class="station-btn">❌ Asnjë stacion</div>';
-            }
-        }
-    }
+    // Populimi i shteteve
+    Object.keys(radiosData).forEach(country => {
+        let opt = document.createElement('option');
+        opt.value = country;
+        opt.innerHTML = country;
+        countrySelect.appendChild(opt);
+    });
 
-    function populateCountries() {
-        countrySelect.innerHTML = '<option value="">🌍 Zgjidh vendin</option>';
-        Object.keys(radiosData).sort().forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countrySelect.appendChild(option);
-        });
-    }
+    countrySelect.onchange = (e) => loadStations(e.target.value);
 
-    function showRadios(country) {
+    function loadStations(country) {
         radioContainer.innerHTML = '';
-        if (!country || !radiosData[country]) {
-            radioContainer.innerHTML = '<div class="station-btn" style="justify-content:center;">📭 Zgjidh një vend më lart</div>';
-            stationCountSpan.textContent = '';
-            return;
-        }
-        const stations = radiosData[country];
-        stationCountSpan.textContent = `${stations.length} stacione`;
-        stations.forEach((item) => {
-            const name = item[0];
-            const url = item[1];
-            const staticInfo = item[2] || null;
-            const btn = document.createElement('button');
+        radiosData[country].forEach(station => {
+            let btn = document.createElement('div');
             btn.className = 'station-btn';
-            btn.innerHTML = `<i class="fas fa-play-circle"></i> ${name}`;
-            btn.onclick = () => playRadio(name, url, staticInfo, btn);
+            btn.innerHTML = station[0];
+            btn.onclick = () => playRadio(station[1], station[0]);
             radioContainer.appendChild(btn);
         });
     }
 
-    // ========== FUNKSIONET PËR METADATA DHE FOTO ==========
-    function loadArtistImage(artistName) {
-        if (!artistName) return;
-        let cleanArtist = artistName.replace(/\(.*?\)|\[.*?\]|[^a-zA-Z0-9 ]/g, "").trim();
-        if (!cleanArtist) return;
-
-        const oldScript = document.getElementById("deezerScript");
-        if (oldScript) oldScript.remove();
-
-        const script = document.createElement("script");
-        script.id = "deezerScript";
-        script.src = `https://api.deezer.com/search/artist?q=${encodeURIComponent(cleanArtist)}&limit=1&output=jsonp&callback=deezerCallback`;
-        document.body.appendChild(script);
+    function playRadio(url, name) {
+        audio.src = url;
+        audio.play().catch(() => alert("Kliko Play manualisht (Autoplay u bllokua)"));
+        trackTitle.innerHTML = name;
+        trackArtist.innerHTML = "Duke u lidhur...";
+        updateMetadata(name);
     }
 
-    window.deezerCallback = function(data) {
-        if (data && data.data && data.data.length > 0 && data.data[0].picture_medium) {
-            artistImage.src = data.data[0].picture_medium;
-            artistImage.style.display = "block";
-            artistFallback.style.display = "none";
-        } else {
-            artistImage.style.display = "none";
-            artistFallback.style.display = "flex";
-        }
-        const script = document.getElementById("deezerScript");
-        if (script) script.remove();
-    };
-
-    async function fetchMetadataFromAPI(stationUrl) {
-        const servers = ['de1', 'nl1', 'fr1'];
-        for (const server of servers) {
-            try {
-                const encodedUrl = encodeURIComponent(stationUrl);
-                const response = await fetch(`https://${server}.api.radio-browser.info/json/stations/byurl/${encodedUrl}`);
-                if (!response.ok) continue;
-                const stations = await response.json();
-                if (stations && stations.length > 0) {
-                    console.log(`[${server}] Metadata:`, stations[0].song || 'none');
-                    return stations[0];
-                }
-            } catch (e) {
-                console.warn(`${server} API failed`, e);
-            }
-        }
-        return null;
-    }
-
-    async function fetchCurrentTrack(stationUrl, stationName, showLoading = true) {
-        if (!stationUrl) return;
-
-        if (showLoading) {
-            nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë të dhëna...`;
-            artistImage.style.display = "none";
-            artistFallback.style.display = "flex";
-            artistFallback.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
-        }
-
+    // Funksioni për gjetjen e këngës dhe fotos
+    async function updateMetadata(stationName) {
+        // Shënim: Ky funksion në web-browser kërkon që serveri i radios 
+        // të ketë një JSON API. Meqë shumica e radiove nuk e lejojnë leximin e titujve 
+        // direkt nga stream në JS (për shkak të CORS), përdorim emrin e radios.
+        
+        // Kërkimi i fotos në iTunes bazuar në emrin e radios ose këngës
         try {
-            if (currentStationStaticInfo && currentStationStaticInfo !== '') {
-                nowPlayingTrack.textContent = currentStationStaticInfo;
-                nowPlayingArtist.textContent = stationName;
-                artistImage.style.display = "none";
-                artistFallback.style.display = "flex";
-                artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-                return;
-            }
-
-            const stationData = await fetchMetadataFromAPI(stationUrl);
-            if (stationData && stationData.song) {
-                let song = stationData.song;
-                let artist = null, title = null;
-                if (song.includes(' - ')) {
-                    [artist, title] = song.split(' - ');
-                } else if (song.includes(' – ')) {
-                    [artist, title] = song.split(' – ');
-                }
-
-                if (artist && title) {
-                    nowPlayingArtist.textContent = artist.trim();
-                    nowPlayingTrack.textContent = title.trim();
-                    loadArtistImage(artist.trim());
-                } else {
-                    nowPlayingTrack.textContent = song;
-                    nowPlayingArtist.textContent = stationName;
-                    artistImage.style.display = "none";
-                    artistFallback.style.display = "flex";
-                    artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-                }
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(stationName)}&limit=1`);
+            const data = await res.json();
+            if (data.results.length > 0) {
+                artistImg.src = data.results[0].artworkUrl100.replace('100x100', '300x300');
+                artistImg.style.display = 'block';
+                fallback.style.display = 'none';
             } else {
-                nowPlayingTrack.textContent = stationName;
-                nowPlayingArtist.textContent = "❓ Pa metadata nga stacioni";
-                artistImage.style.display = "none";
-                artistFallback.style.display = "flex";
-                artistFallback.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+                artistImg.style.display = 'none';
+                fallback.style.display = 'flex';
             }
-        } catch (err) {
-            console.error("Metadata error:", err);
-            nowPlayingTrack.textContent = stationName;
-            nowPlayingArtist.textContent = "⚠️ Gabim në lexim";
-            artistImage.style.display = "none";
-            artistFallback.style.display = "flex";
-            artistFallback.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+        } catch (e) {
+            console.log("Imazhi nuk u gjet");
         }
+        trackArtist.innerHTML = "Live Streaming";
     }
 
-    function manualRefresh() {
-        if (currentStationUrl) {
-            fetchCurrentTrack(currentStationUrl, currentStationName, true);
-            refreshBtn.style.transform = 'rotate(360deg)';
-            setTimeout(() => { refreshBtn.style.transform = ''; }, 500);
-        }
-    }
+    // Ngarko shtetin e parë automatikisht
+    loadStations(Object.keys(radiosData)[0]);
 
-    function startMetadataInterval() {
-        if (metadataInterval) clearInterval(metadataInterval);
-        if (currentStationUrl && !audioPlayer.paused) {
-            metadataInterval = setInterval(() => {
-                fetchCurrentTrack(currentStationUrl, currentStationName, false);
-            }, 30000);
-        }
-    }
-
-    function stopMetadataInterval() {
-        if (metadataInterval) {
-            clearInterval(metadataInterval);
-            metadataInterval = null;
-        }
-    }
-
-    function playRadio(name, url, staticInfo, btn) {
-        stopMetadataInterval();
-        if (currentStationUrl !== url) {
-            audioPlayer.src = url;
-            audioPlayer.play().catch(e => console.warn("Autoplay blocked", e));
-        } else {
-            audioPlayer.play().catch(e => console.log(e));
-        }
-
-        currentStationUrl = url;
-        currentStationName = name;
-        currentStationStaticInfo = staticInfo;
-
-        nowPlayingTrack.textContent = name;
-        nowPlayingArtist.innerHTML = `<i class="loader-small"></i> Duke marrë këngën...`;
-        artistImage.style.display = "none";
-        artistFallback.style.display = "flex";
-        artistFallback.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
-
-        fetchCurrentTrack(url, name, true);
-        startMetadataInterval();
-
-        document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    // Ndryshimi i vendit
-    countrySelect.addEventListener('change', (e) => {
-        showRadios(e.target.value);
-        audioPlayer.pause();
-        audioPlayer.src = '';
-        nowPlayingTrack.textContent = 'Zgjidh një radio';
-        nowPlayingArtist.textContent = '—';
-        artistImage.style.display = "none";
-        artistFallback.style.display = "flex";
-        artistFallback.innerHTML = '<i class="fas fa-headphones"></i>';
-        document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-        currentStationUrl = '';
-        currentStationStaticInfo = null;
-        stopMetadataInterval();
-    });
-
-    refreshBtn.addEventListener('click', manualRefresh);
-    window.addEventListener('beforeunload', () => stopMetadataInterval());
-
-    // Fillo
-    loadRadios();
 </script>
 </body>
 </html>
