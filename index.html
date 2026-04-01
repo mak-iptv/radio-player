@@ -103,18 +103,35 @@
     const countrySelect = document.getElementById('countrySelect');
 
     // Këtu vendosen të dhënat e radiove (Default stations që kishit)
-    const radiosData = {
-        "Shqipëri / Kosovë": [
-            ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream"],
-            ["Top Albania Radio", "https://live.top-media.al/tar"]
-        ],
-        "Bullgaria": [
-            ["Radio Fresh", "https://stream.rcast.net/71094"],
-            ["NRJ Bulgaria", "https://play.global.audio/nrj.aac"]
-        ]
-        // Shtoni të tjerat këtu...
-    };
+   async function loadRadios() {
+    try {
+        const response = await fetch('radios.json');
+        const radiosData = await response.json();
+        
+        // Funksioni për të mbushur dropdown-in me shtete
+        populateCountries(radiosData);
+        
+        console.log("Listat e radiove u ngarkuan me sukses!");
+    } catch (error) {
+        console.error("Gabim gjatë ngarkimit të radios.json:", error);
+    }
+}
 
+function populateCountries(data) {
+    const select = document.getElementById('countrySelect');
+    Object.keys(data).forEach(country => {
+        let opt = document.createElement('option');
+        opt.value = country;
+        opt.innerHTML = country;
+        select.appendChild(opt);
+    });
+    
+    // Ngarko shtetin e parë si default
+    showRadios(Object.keys(data)[0], data);
+}
+
+// Thirr funksionin kur hapet faqja
+loadRadios();
     // Populimi i shteteve
     Object.keys(radiosData).forEach(country => {
         let opt = document.createElement('option');
