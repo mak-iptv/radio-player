@@ -2,192 +2,245 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Wave Radio | Player HD Shqip</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Radio HD | Player Shqip & Ballkan</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Përdor stilet e tua ekzistuese këtu (i kam mbajtur të njëjtat për konsistencë) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-gradient: linear-gradient(135deg, #0b1120 0%, #0a0f1a 100%);
-            --card-bg: rgba(15, 25, 45, 0.75);
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.7);
             --primary: #3b82f6;
-            --text-light: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border-glow: rgba(59, 130, 246, 0.3);
-            --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --accent: #60a5fa;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
         }
         body {
-            background: var(--bg-gradient);
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
             font-family: 'Inter', sans-serif;
-            color: var(--text-light);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 1.5rem;
+            padding: 20px;
         }
-        .radio-app { max-width: 1000px; width: 100%; margin: 0 auto; }
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
+        .container { max-width: 900px; width: 100%; }
+        
+        /* Glass Card */
+        .player-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 2rem;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-        .app-header { padding: 1.8rem 2rem 1rem; text-align: center; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .logo { font-size: 2.2rem; font-weight: 800; background: linear-gradient(120deg, #fff, var(--primary)); -webkit-background-clip: text; color: transparent; }
-        .now-playing-card {
-            background: rgba(0, 0, 0, 0.4); margin: 1.5rem 2rem 0; border-radius: 1.5rem;
-            padding: 1.2rem; display: flex; align-items: center; gap: 1.2rem; border: 1px solid rgba(255, 255, 255, 0.05);
+
+        /* Header */
+        .header { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .logo { font-size: 2rem; font-weight: 800; letter-spacing: -1px; color: #fff; }
+        .logo span { color: var(--primary); }
+
+        /* Now Playing */
+        .now-playing {
+            display: flex; align-items: center; gap: 20px;
+            padding: 20px 30px; background: rgba(0,0,0,0.2);
+            margin: 20px; border-radius: 1.5rem;
         }
-        .artist-image { width: 70px; height: 70px; border-radius: 1.2rem; object-fit: cover; border: 1px solid var(--border-glow); }
-        .fallback-icon { width: 70px; height: 70px; border-radius: 1.2rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #1e293b; border: 1px solid var(--border-glow); }
-        .track-info { flex: 1; overflow: hidden; }
-        .track-name { font-weight: 700; font-size: 1.3rem; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-artist { color: var(--primary); font-weight: 500; }
-        .audio-wrapper { padding: 1rem 2rem; }
-        audio { width: 100%; height: 45px; }
-        .select-region { padding: 0.5rem 2rem; }
-        .custom-select { width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid var(--border-glow); border-radius: 60px; color: white; appearance: none; }
-        .stations-area { padding: 1.2rem 2rem 1.8rem; }
-        .stations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; }
-        .station-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.8rem; border-radius: 1.2rem; color: white; cursor: pointer; text-align: center; transition: var(--transition); }
-        .station-btn:hover, .station-btn.active { background: var(--primary); transform: translateY(-2px); }
-        .apk-button { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(59,130,246,0.2); border-radius: 40px; padding: 0.4rem 1rem; color: var(--primary); text-decoration: none; font-size: 0.75rem; }
+        .cover-art { 
+            width: 80px; height: 80px; border-radius: 1rem; 
+            background: #334155; display: flex; align-items: center; 
+            justify-content: center; font-size: 2rem; overflow: hidden;
+            border: 2px solid var(--primary);
+        }
+        .cover-art img { width: 100%; height: 100%; object-fit: cover; }
+        .track-info { flex: 1; }
+        .track-title { font-size: 1.2rem; font-weight: 700; display: block; }
+        .track-status { font-size: 0.85rem; color: var(--primary); font-weight: 600; text-transform: uppercase; }
+
+        /* Controls */
+        .controls { padding: 10px 30px 30px; }
+        audio { width: 100%; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
+
+        /* Selection Area */
+        .selection-grid { padding: 0 30px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        select, input {
+            background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 15px; border-radius: 12px; color: white; outline: none;
+        }
+
+        /* Radio Grid */
+        .radio-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px; padding: 20px 30px 40px; max-height: 400px; overflow-y: auto;
+        }
+        .radio-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 15px; cursor: pointer; text-align: center;
+            transition: 0.3s; font-size: 0.9rem; font-weight: 500;
+        }
+        .radio-item:hover, .radio-item.active {
+            background: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        @media (max-width: 600px) {
+            .selection-grid { grid-template-columns: 1fr; }
+            .radio-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div class="radio-app">
-    <div class="glass-card">
-        <div class="app-header">
-            <div class="logo"><i class="fas fa-wave-square"></i> WAVE RADIO</div>
-            <a href="#" class="apk-button"><i class="fab fa-android"></i> APK</a>
+<div class="container">
+    <div class="player-card">
+        <div class="header">
+            <div class="logo">WAVE<span>RADIO</span></div>
+            <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 5px;">HD Live Streaming</p>
         </div>
 
-        <div class="now-playing-card">
-            <div id="imageContainer">
-                <div class="fallback-icon" id="artistFallback"><i class="fas fa-music"></i></div>
-                <img id="artistImage" class="artist-image" style="display: none;">
+        <div class="now-playing">
+            <div class="cover-art" id="coverArt">
+                <i class="fas fa-radio" id="defaultIcon"></i>
+                <img id="artistImg" style="display:none">
             </div>
             <div class="track-info">
-                <div class="track-name" id="trackTitle">Zgjidh një radio</div>
-                <div class="track-artist" id="trackArtist">Prisni...</div>
+                <span class="track-status" id="statusText">Gati</span>
+                <span class="track-title" id="currentStationName">Zgjidh një stacion</span>
             </div>
         </div>
 
-        <div class="audio-wrapper">
-            <audio id="audioPlayer" controls></audio>
+        <div class="controls">
+            <audio id="mainAudio" controls></audio>
         </div>
 
-        <div class="select-region">
-            <select id="countrySelect" class="custom-select"></select>
+        <div class="selection-grid">
+            <select id="countryFilter"></select>
+            <input type="text" id="searchInput" placeholder="Kërko radio...">
         </div>
 
-        <div class="stations-area">
-            <div id="radioContainer" class="stations-grid"></div>
+        <div class="radio-grid" id="radioGrid"></div>
+        
+        <div style="text-align: center; padding-bottom: 20px; font-size: 0.7rem; color: var(--text-dim);">
+            &copy; 2026 Wave Radio Player - Shqipëri & Ballkan
         </div>
     </div>
 </div>
 
 <script>
-    const audio = document.getElementById('audioPlayer');
-    const trackTitle = document.getElementById('trackTitle');
-    const trackArtist = document.getElementById('trackArtist');
-    const artistImg = document.getElementById('artistImage');
-    const fallback = document.getElementById('artistFallback');
-    const radioContainer = document.getElementById('radioContainer');
-    const countrySelect = document.getElementById('countrySelect');
+    const radiosData = {
+        "Shqipëri / Kosovë": [
+            ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream"],
+            ["Radio Mergimi", "https://mars.streamerr.co/8114/stream"],
+            ["My Music Radio", "https://live.top-media.al/mmr"],
+            ["Radio Shqip Folklor", "http://85.215.168.56:8010/folklor"],
+            ["Top Albania Radio", "https://live.top-media.al/tar"],
+            ["Radio Club FM", "https://cp1.sednastream.com/proxy/clubfm?mp=/stream"],
+            ["Klan Radio", "https://klanradio.tvklan.al/live/klanmusicradio1/playlist.m3u8"]
+        ],
+        "Bullgaria": [
+            ["Radio Fresh", "https://stream.rcast.net/71094"],
+            ["NRJ Bulgaria", "https://play.global.audio/nrj.aac"],
+            ["Energy 89.5", "https://play.global.audio/energy-00shi.aac"],
+            ["The Voice BG", "https://nova-radio.neterra.tv/thevoice"]
+        ],
+        "Maqedoni": [
+            ["Radio Bubamara", "https://stream.bubamara.com.mk/live"],
+            ["Antenna 5", "http://antenna5stream.neotel.mk:8000/live128"],
+            ["City Radio", "http://176.9.117.123:9998/live"]
+        ],
+        "Bosna": [
+            ["Radio Mix", "https://stream.rsgmedia.ba/listen/radio_mix/radio.mp3"],
+            ["Kalman Radio", "http://188.40.62.20:8004/stream"],
+            ["BN Radio", "https://stream.radiobn.net/"]
+        ],
+        "Serbi": [
+            ["Naxi Radio", "https://naxi64ssl.streaming.rs:9162/;stream.nsv"],
+            ["Pink Radio", "https://edge9.pink.rs/pinkstream"],
+            ["OK Radio", "https://stream1.okradio.net/"]
+        ],
+        "Hrvatska": [
+            ["Otvoreni Radio", "https://stream2.otvoreni.hr/otvoreni"],
+            ["Extra FM", "http://streams.extrafm.hr:8110/"],
+            ["Radio Banovina", "https://audio.radio-banovina.hr:9998/stream"]
+        ],
+        "Montenegro": [
+            ["Radio D plus", "https://radiodplus.radioca.st/xstream"],
+            ["Elmag Radio", "https://radio.elmag.me/elmag.mp3"]
+        ]
+    };
 
-    // Këtu vendosen të dhënat e radiove (Default stations që kishit)
-   async function loadRadios() {
-    try {
-        const response = await fetch('radios.json');
-        const radiosData = await response.json();
-        
-        // Funksioni për të mbushur dropdown-in me shtete
-        populateCountries(radiosData);
-        
-        console.log("Listat e radiove u ngarkuan me sukses!");
-    } catch (error) {
-        console.error("Gabim gjatë ngarkimit të radios.json:", error);
+    const audio = document.getElementById('mainAudio');
+    const radioGrid = document.getElementById('radioGrid');
+    const countryFilter = document.getElementById('countryFilter');
+    const searchInput = document.getElementById('searchInput');
+    const stationNameDisplay = document.getElementById('currentStationName');
+    const statusText = document.getElementById('statusText');
+    const artistImg = document.getElementById('artistImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+
+    // Inicializimi i Dropdown
+    function init() {
+        Object.keys(radiosData).forEach(country => {
+            let opt = document.createElement('option');
+            opt.value = country;
+            opt.textContent = country;
+            countryFilter.appendChild(opt);
+        });
+        renderRadios("Shqipëri / Kosovë");
     }
-}
 
-function populateCountries(data) {
-    const select = document.getElementById('countrySelect');
-    Object.keys(data).forEach(country => {
-        let opt = document.createElement('option');
-        opt.value = country;
-        opt.innerHTML = country;
-        select.appendChild(opt);
-    });
-    
-    // Ngarko shtetin e parë si default
-    showRadios(Object.keys(data)[0], data);
-}
-
-// Thirr funksionin kur hapet faqja
-loadRadios();
-    // Populimi i shteteve
-    Object.keys(radiosData).forEach(country => {
-        let opt = document.createElement('option');
-        opt.value = country;
-        opt.innerHTML = country;
-        countrySelect.appendChild(opt);
-    });
-
-    countrySelect.onchange = (e) => loadStations(e.target.value);
-
-    function loadStations(country) {
-        radioContainer.innerHTML = '';
-        radiosData[country].forEach(station => {
-            let btn = document.createElement('div');
-            btn.className = 'station-btn';
-            btn.innerHTML = station[0];
-            btn.onclick = () => playRadio(station[1], station[0]);
-            radioContainer.appendChild(btn);
+    // Shfaqja e radiove
+    function renderRadios(country, filter = "") {
+        radioGrid.innerHTML = "";
+        let stations = radiosData[country] || [];
+        
+        stations.forEach(station => {
+            if (station[0].toLowerCase().includes(filter.toLowerCase())) {
+                let div = document.createElement('div');
+                div.className = 'radio-item';
+                div.textContent = station[0];
+                div.onclick = () => playRadio(station[1], station[0]);
+                radioGrid.appendChild(div);
+            }
         });
     }
 
-    function playRadio(url, name) {
+    // Funksioni Play
+    async function playRadio(url, name) {
         audio.src = url;
-        audio.play().catch(() => alert("Kliko Play manualisht (Autoplay u bllokua)"));
-        trackTitle.innerHTML = name;
-        trackArtist.innerHTML = "Duke u lidhur...";
-        updateMetadata(name);
-    }
-
-    // Funksioni për gjetjen e këngës dhe fotos
-    async function updateMetadata(stationName) {
-        // Shënim: Ky funksion në web-browser kërkon që serveri i radios 
-        // të ketë një JSON API. Meqë shumica e radiove nuk e lejojnë leximin e titujve 
-        // direkt nga stream në JS (për shkak të CORS), përdorim emrin e radios.
+        audio.play();
+        stationNameDisplay.textContent = name;
+        statusText.textContent = "Duke Luajtur...";
         
-        // Kërkimi i fotos në iTunes bazuar në emrin e radios ose këngës
+        // Gjej foto per radion (iTunes API)
         try {
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(stationName)}&limit=1`);
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&limit=1`);
             const data = await res.json();
             if (data.results.length > 0) {
                 artistImg.src = data.results[0].artworkUrl100.replace('100x100', '300x300');
                 artistImg.style.display = 'block';
-                fallback.style.display = 'none';
+                defaultIcon.style.display = 'none';
             } else {
                 artistImg.style.display = 'none';
-                fallback.style.display = 'flex';
+                defaultIcon.style.display = 'block';
             }
         } catch (e) {
-            console.log("Imazhi nuk u gjet");
+            artistImg.style.display = 'none';
+            defaultIcon.style.display = 'block';
         }
-        trackArtist.innerHTML = "Live Streaming";
     }
 
-    // Ngarko shtetin e parë automatikisht
-    loadStations(Object.keys(radiosData)[0]);
+    // Eventet
+    countryFilter.onchange = (e) => renderRadios(e.target.value);
+    searchInput.oninput = (e) => renderRadios(countryFilter.value, e.target.value);
 
+    init();
 </script>
+
 </body>
 </html>
