@@ -219,7 +219,29 @@ async function playRadio(url, name) {
     // Provon të gjejë titullin/foton nga iTunes
     fetchMetadata(name);
 }
+async function playRadio(url, name) {
+    audio.src = url;
+    audio.play();
 
+    // Kjo pjesë i thotë telefonit që po luhet muzikë
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: name,
+            artist: "Wave Radio HD",
+            album: "Live Streaming",
+            artwork: [
+                { src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png' }
+            ]
+        });
+
+        // Lejon kontrollin nga ekrani i bllokuar (Lock Screen)
+        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+    }
+    
+    stationNameDisplay.textContent = name;
+    statusText.textContent = "Duke u lidhur...";
+}
 async function fetchMetadata(name) {
     try {
         const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&limit=1`);
