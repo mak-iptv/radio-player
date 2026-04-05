@@ -157,96 +157,95 @@
         "Bosna": [ ["Radio Mix", "https://stream.rsgmedia.ba/listen/radio_mix/radio.mp3"] ]
     };
 
-    const audio = document.getElementById('mainAudio');
-    const radioGrid = document.getElementById('radioGrid');
-    const countryFilter = document.getElementById('countryFilter');
-    const searchInput = document.getElementById('searchInput');
-    const stationNameDisplay = document.getElementById('currentStationName');
-    const statusText = document.getElementById('statusText');
-    const artistImg = document.getElementById('artistImg');
-    const defaultIcon = document.getElementById('defaultIcon');
-    const radioIcon = document.getElementById('radioIcon');
+   const audio = document.getElementById('mainAudio');
+const radioGrid = document.getElementById('radioGrid');
+const countryFilter = document.getElementById('countryFilter');
+const searchInput = document.getElementById('searchInput');
+const stationNameDisplay = document.getElementById('currentStationName');
+const statusText = document.getElementById('statusText');
+const artistImg = document.getElementById('artistImg');
+const defaultIcon = document.getElementById('defaultIcon');
 
-    let currentRadioName = "";
+let GLOBAL_RADIOS = {}; // Këtu do ruhen radiot nga JSON
 
-    function init() {
-        Object.keys(radiosData).forEach(country => {
+async function init() {
+    try {
+        // 1. Merr të dhënat nga skedari JSON
+        const response = await fetch('radios.json');
+        GLOBAL_RADIOS = await response.json();
+
+        // 2. Mbush dropdown-in me shtetet
+        Object.keys(GLOBAL_RADIOS).forEach(country => {
             let opt = document.createElement('option');
             opt.value = country;
             opt.textContent = country;
             countryFilter.appendChild(opt);
         });
-        renderRadios("Shqipëri / Kosovë");
+
+        // 3. Shfaq listën e parë (psh: Shqipëri)
+        renderRadios(Object.keys(GLOBAL_RADIOS)[0]);
+
+    } catch (error) {
+        console.error("Gabim gjatë ngarkimit të JSON:", error);
+        statusText.textContent = "Gabim në server!";
     }
+}
 
-    function renderRadios(country, filter = "") {
-        radioGrid.innerHTML = "";
-        let stations = radiosData[country] || [];
-        stations.forEach(station => {
-            if (station[0].toLowerCase().includes(filter.toLowerCase())) {
-                let div = document.createElement('div');
-                div.className = 'radio-item';
-                div.textContent = station[0];
-                div.onclick = () => playRadio(station[1], station[0]);
-                radioGrid.appendChild(div);
-            }
-        });
-    }
-
-    async function playRadio(url, name) {
-        currentRadioName = name;
-        audio.src = url;
-        audio.play();
+function renderRadios(country, filter = "") {
+    radioGrid.innerHTML = "";
+    const stations = GLOBAL_RADIOS[country] || [];
+    
+    stations.forEach(station => {
+        const name = station[0];
+        const url = station[1];
         
-        stationNameDisplay.textContent = name;
-        statusText.textContent = "Duke u lidhur...";
-        
-        // Vizualizimi i loading
-        radioIcon.style.display = "none";
-        defaultIcon.style.display = "block";
-        artistImg.style.display = "none";
+        if (name.toLowerCase().includes(filter.toLowerCase())) {
+            let div = document.createElement('div');
+            div.className = 'radio-item';
+            div.textContent = name;
+            div.onclick = () => playRadio(url, name);
+            radioGrid.appendChild(div);
+        }
+    });
+}
 
-        audio.onplaying = () => {
+async function playRadio(url, name) {
+    audio.src = url;
+    audio.play();
+    
+    stationNameDisplay.textContent = name;
+    statusText.textContent = "Duke u lidhur...";
+    
+    // Provon të gjejë titullin/foton nga iTunes
+    fetchMetadata(name);
+}
+
+async function fetchMetadata(name) {
+    try {
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&limit=1`);
+        const data = await res.json();
+        
+        if (data.results.length > 0) {
+            artistImg.src = data.results[0].artworkUrl100.replace('100x100', '300x300');
+            artistImg.style.display = 'block';
+            defaultIcon.style.display = 'none';
             statusText.textContent = "Live Now";
-            defaultIcon.className = "fas fa-compact-disc fa-spin";
-            updateArtwork(name);
-        };
-    }
-
-    async function updateArtwork(query) {
-        try {
-            // Kërkojmë në iTunes për të gjetur një imazh që i përshtatet emrit
-            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&limit=1&entity=song`);
-            const data = await res.json();
-            
-            if (data.results.length > 0) {
-                const track = data.results[0];
-                artistImg.src = track.artworkUrl100.replace('100x100', '400x400');
-                artistImg.style.display = 'block';
-                defaultIcon.style.display = 'none';
-                // Përditësojmë titullin nëse iTunes gjen këngën specifike
-                stationNameDisplay.textContent = `${track.artistName} - ${track.trackName}`;
-            } else {
-                artistImg.style.display = 'none';
-                radioIcon.style.display = "block";
-                defaultIcon.style.display = 'none';
-            }
-        } catch (e) {
-            console.error("Error fetching artwork");
+        } else {
+            artistImg.style.display = 'none';
+            defaultIcon.style.display = 'block';
         }
+    } catch (e) {
+        artistImg.style.display = 'none';
+        defaultIcon.style.display = 'block';
     }
+}
 
-    // Refresh artwork çdo 30 sekonda në rast se ndryshon kënge (simulim)
-    setInterval(() => {
-        if (!audio.paused && currentRadioName !== "") {
-            updateArtwork(currentRadioName);
-        }
-    }, 30000);
+// Eventet e filtrave
+countryFilter.onchange = (e) => renderRadios(e.target.value);
+searchInput.oninput = (e) => renderRadios(countryFilter.value, e.target.value);
 
-    countryFilter.onchange = (e) => renderRadios(e.target.value);
-    searchInput.oninput = (e) => renderRadios(countryFilter.value, e.target.value);
-
-    init();
+// Nis aplikacionin
+init();
 </script>
 
 </body>
