@@ -26,7 +26,6 @@
             padding: 20px;
         }
         .container { max-width: 900px; width: 100%; }
-        
         .player-card {
             background: var(--card);
             backdrop-filter: blur(20px);
@@ -35,7 +34,6 @@
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-
         .header { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .logo { font-size: 2rem; font-weight: 800; letter-spacing: -1px; color: #fff; }
         .logo span { color: var(--primary); }
@@ -51,26 +49,21 @@
             justify-content: center; font-size: 2rem; overflow: hidden;
             border: 2px solid var(--primary); flex-shrink: 0;
         }
-        .cover-art img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .cover-art img { width: 100%; height: 100%; object-fit: cover; }
         
         .track-info { flex: 1; overflow: hidden; }
         .track-status { font-size: 0.85rem; color: var(--primary); font-weight: 600; text-transform: uppercase; }
         
-        /* Marquee Efekti */
-        .marquee-container { width: 100%; overflow: hidden; position: relative; height: 30px; }
+        .marquee-container { width: 100%; overflow: hidden; white-space: nowrap; }
         .track-title { 
             font-size: 1.2rem; 
             font-weight: 700; 
-            position: absolute;
-            white-space: nowrap;
-            will-change: transform;
+            display: inline-block;
+            padding-left: 100%;
             animation: marquee 15s linear infinite;
         }
 
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
         .controls { padding: 10px 30px 30px; }
         audio { width: 100%; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
@@ -91,14 +84,8 @@
             transition: 0.3s; font-size: 0.9rem; font-weight: 500;
         }
         .radio-item:hover { background: var(--primary); transform: translateY(-3px); }
-
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-
-        @media (max-width: 600px) {
-            .selection-grid { grid-template-columns: 1fr; }
-            .radio-grid { grid-template-columns: 1fr 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -112,8 +99,7 @@
 
         <div class="now-playing">
             <div class="cover-art" id="coverArt">
-                <i class="fas fa-compact-disc fa-spin" id="defaultIcon" style="display:none"></i>
-                <i class="fas fa-radio" id="radioIcon"></i>
+                <i class="fas fa-compact-disc fa-spin" id="defaultIcon"></i>
                 <img id="artistImg" style="display:none">
             </div>
             <div class="track-info">
@@ -136,138 +122,119 @@
         <div class="radio-grid" id="radioGrid"></div>
         
         <div style="text-align: center; padding-bottom: 20px; font-size: 0.7rem; color: var(--text-dim);">
-            &copy; 2026 Wave Radio Player - Audio Engine v3.0
+            &copy; 2026 Wave Radio Player - Audio Engine v4.0
         </div>
     </div>
 </div>
 
 <script>
-    // Të dhënat e tua mbeten të njëjta (i kam shkurtuar këtu për hapësirë)
-    const radiosData = {
-        "Shqipëri / Kosovë": [
-            ["Radio Shqip", "https://cp1.sednastream.com/proxy/radioshqip?mp=/stream"],
-            ["Radio Mergimi", "https://mars.streamerr.co/8114/stream"],
-            ["My Music Radio", "https://live.top-media.al/mmr"],
-            ["Top Albania Radio", "https://live.topgold.al/tar"],
-            ["Club FM", "https://cp1.sednastream.com/proxy/clubfm?mp=/stream"],
-            ["Radio One", "https://cp1.sednastream.com/proxy/radioone94?mp=/stream"]
-            // Shto të tjerat këtu siç i kive...
-        ],
-        "Maqedoni": [ ["Radio Bubamara", "https://stream.bubamara.com.mk/live"] ],
-        "Bosna": [ ["Radio Mix", "https://stream.rsgmedia.ba/listen/radio_mix/radio.mp3"] ]
-    };
+    const audio = document.getElementById('mainAudio');
+    const radioGrid = document.getElementById('radioGrid');
+    const countryFilter = document.getElementById('countryFilter');
+    const searchInput = document.getElementById('searchInput');
+    const stationNameDisplay = document.getElementById('currentStationName');
+    const statusText = document.getElementById('statusText');
+    const artistImg = document.getElementById('artistImg');
+    const defaultIcon = document.getElementById('defaultIcon');
 
-   const audio = document.getElementById('mainAudio');
-const radioGrid = document.getElementById('radioGrid');
-const countryFilter = document.getElementById('countryFilter');
-const searchInput = document.getElementById('searchInput');
-const stationNameDisplay = document.getElementById('currentStationName');
-const statusText = document.getElementById('statusText');
-const artistImg = document.getElementById('artistImg');
-const defaultIcon = document.getElementById('defaultIcon');
+    let GLOBAL_RADIOS = {};
 
-let GLOBAL_RADIOS = {}; // Këtu do ruhen radiot nga JSON
+    async function init() {
+        try {
+            // Sigurohu që skedari radios.json është në të njëjtin folder
+            const response = await fetch('radios.json');
+            GLOBAL_RADIOS = await response.json();
 
-async function init() {
-    try {
-        // 1. Merr të dhënat nga skedari JSON
-        const response = await fetch('radios.json');
-        GLOBAL_RADIOS = await response.json();
+            Object.keys(GLOBAL_RADIOS).forEach(country => {
+                let opt = document.createElement('option');
+                opt.value = country;
+                opt.textContent = country;
+                countryFilter.appendChild(opt);
+            });
 
-        // 2. Mbush dropdown-in me shtetet
-        Object.keys(GLOBAL_RADIOS).forEach(country => {
-            let opt = document.createElement('option');
-            opt.value = country;
-            opt.textContent = country;
-            countryFilter.appendChild(opt);
-        });
-
-        // 3. Shfaq listën e parë (psh: Shqipëri)
-        renderRadios(Object.keys(GLOBAL_RADIOS)[0]);
-
-    } catch (error) {
-        console.error("Gabim gjatë ngarkimit të JSON:", error);
-        statusText.textContent = "Gabim në server!";
-    }
-}
-
-function renderRadios(country, filter = "") {
-    radioGrid.innerHTML = "";
-    const stations = GLOBAL_RADIOS[country] || [];
-    
-    stations.forEach(station => {
-        const name = station[0];
-        const url = station[1];
-        
-        if (name.toLowerCase().includes(filter.toLowerCase())) {
-            let div = document.createElement('div');
-            div.className = 'radio-item';
-            div.textContent = name;
-            div.onclick = () => playRadio(url, name);
-            radioGrid.appendChild(div);
+            renderRadios(Object.keys(GLOBAL_RADIOS)[0]);
+        } catch (error) {
+            console.error("Gabim:", error);
+            statusText.textContent = "Lidhja dështoi!";
         }
-    });
-}
+    }
 
-async function playRadio(url, name) {
-    audio.src = url;
-    audio.play();
-    
-    stationNameDisplay.textContent = name;
-    statusText.textContent = "Duke u lidhur...";
-    
-    // Provon të gjejë titullin/foton nga iTunes
-    fetchMetadata(name);
-}
-async function playRadio(url, name) {
-    audio.src = url;
-    audio.play();
-
-    // Kjo pjesë i thotë telefonit që po luhet muzikë
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: name,
-            artist: "Wave Radio HD",
-            album: "Live Streaming",
-            artwork: [
-                { src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png' }
-            ]
+    function renderRadios(country, filter = "") {
+        radioGrid.innerHTML = "";
+        const stations = GLOBAL_RADIOS[country] || [];
+        stations.forEach(station => {
+            if (station[0].toLowerCase().includes(filter.toLowerCase())) {
+                let div = document.createElement('div');
+                div.className = 'radio-item';
+                div.textContent = station[0];
+                div.onclick = () => playRadio(station[1], station[0]);
+                radioGrid.appendChild(div);
+            }
         });
-
-        // Lejon kontrollin nga ekrani i bllokuar (Lock Screen)
-        navigator.mediaSession.setActionHandler('play', () => audio.play());
-        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
     }
-    
-    stationNameDisplay.textContent = name;
-    statusText.textContent = "Duke u lidhur...";
-}
-async function fetchMetadata(name) {
-    try {
-        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&limit=1`);
-        const data = await res.json();
+
+    async function playRadio(url, name) {
+        audio.src = url;
+        audio.play();
         
-        if (data.results.length > 0) {
-            artistImg.src = data.results[0].artworkUrl100.replace('100x100', '300x300');
-            artistImg.style.display = 'block';
-            defaultIcon.style.display = 'none';
-            statusText.textContent = "Live Now";
-        } else {
-            artistImg.style.display = 'none';
-            defaultIcon.style.display = 'block';
+        stationNameDisplay.textContent = name;
+        statusText.textContent = "Duke u lidhur...";
+        
+        // 1. Kërko Metadata në iTunes
+        fetchMetadata(name);
+
+        // 2. Aktivizo MediaSession (për Lock Screen dhe Background)
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: name,
+                artist: "Wave Radio HD",
+                album: "Live Streaming",
+                artwork: [{ src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png' }]
+            });
+
+            navigator.mediaSession.setActionHandler('play', () => audio.play());
+            navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         }
-    } catch (e) {
-        artistImg.style.display = 'none';
-        defaultIcon.style.display = 'block';
     }
-}
 
-// Eventet e filtrave
-countryFilter.onchange = (e) => renderRadios(e.target.value);
-searchInput.oninput = (e) => renderRadios(countryFilter.value, e.target.value);
+    async function fetchMetadata(searchTerm) {
+        try {
+            // Përdorim iTunes API për të gjetur artistin/këngën bazuar në emrin e radios ose këngës
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&limit=1&entity=song`);
+            const data = await res.json();
+            
+            if (data.results.length > 0) {
+                const track = data.results[0];
+                artistImg.src = track.artworkUrl100.replace('100x100', '400x400');
+                artistImg.style.display = 'block';
+                defaultIcon.style.display = 'none';
+                
+                // Përditëso Titullin me emrin e këngës së gjetur
+                stationNameDisplay.textContent = `${track.artistName} - ${track.trackName}`;
+                statusText.textContent = "Live Tani";
 
-// Nis aplikacionin
-init();
+                // Përditëso Lock Screen nëse jemi në telefon
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: track.trackName,
+                        artist: track.artistName,
+                        artwork: [{ src: track.artworkUrl100.replace('100x100', '512x512') }]
+                    });
+                }
+            } else {
+                artistImg.style.display = 'none';
+                defaultIcon.style.display = 'block';
+                statusText.textContent = "Live Stream";
+            }
+        } catch (e) {
+            console.log("Metadata Error");
+        }
+    }
+
+    countryFilter.onchange = (e) => renderRadios(e.target.value);
+    searchInput.oninput = (e) => renderRadios(countryFilter.value, e.target.value);
+
+    init();
 </script>
 
 </body>
